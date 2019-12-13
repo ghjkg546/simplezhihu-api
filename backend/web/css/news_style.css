@@ -1,0 +1,45 @@
+body {
+	font-family: "微软雅黑"; font-size:12px; color:#333333;
+}
+a:hover{ color:#5FCDEE;}
+
+
+
+/*新闻页*/
+.art_box{ width:100%; margin:auto;/*background:#fff;*//*background: #ffffff url(/Public/Images/front/inner_bg.jpg);*/}
+.art_content{width:1000px; margin:auto; padding:5px;/*background: url(/Public/Images/front/art_list_bg.jpg) repeat;*/box-sizing:border-box;background-color: #fff;margin-top: 15px;}
+.art_content img{max-width:100%;vertical-align: top;margin: -1px;}
+.art_nav{width:95%; margin:0 auto 15px; height:34px; padding:8px 0 0 0px; font-family:"微软雅黑"; font-size:14px; color:#666666; border-bottom:1px solid #d2d0d0;}
+.art_list{ width:100%; padding:10px; float:left;}
+.art_listimg{ width:170px; float:left; text-align:left;}
+.art_listdesc{ width:80%; float:left;}
+.art_button{width:80%; margin:8px auto; height:30px; padding:10px 5px; text-align:center; }
+.a1{ padding:3px 5px;}
+
+.art_bu_nav{ width:30px;display:inline-block; margin-top:3px; padding:6px 0; text-align:center;background:#FFFFFF;}
+.art_bu_nav:hover{ width:30px; margin-top:3px; display:inline-block; padding:6px 0; text-align:center;}
+.art_bu_nav2{ width:30px; color:#ffffff; margin-top:3px; display:inline-block; padding:6px 0; text-align:center;background:#666666;}
+
+.art_show_title{ font-family:"微软雅黑"; font-size:19px; color:#333; text-align:center; font-weight:normal;margin-top: 10px;}
+.art_show1{ width:100%; margin:15px auto 15px; background: url(../../Images/front/art_listbox_bg.jpg) bottom no-repeat;text-align:center; height:40px;font-family:"微软雅黑"; font-size:12px; color:#999; text-align:center;}
+.art_show2{ width:88%; margin:auto;margin-top:20px;min-height: 500px; }
+.art_listdesc p{margin-top:20px;}
+.art_show_nav{ width:93%;  margin:5px 0 2px 6%; line-height:25px;color: #000;font-weight: bold;}
+.art_show_nav a{ padding:3px 4px;}
+.art_show_nav a:hover{ color:#5FCDEE;}
+.art_content .addtime{display: inline-block;background: url(../../Images/front/icon_sj.png) no-repeat;    width: 14px;
+    height: 14px;
+    background-size: contain;
+    vertical-align: middle;
+    margin-right: 5px;}
+.art_content .view_num{display: inline-block;background: url(../../Images/front/icon_ck.png) no-repeat;    width: 14px;
+    height: 14px;
+    background-size: contain;
+    vertical-align: middle;
+    margin-right: 5px;
+margin-left: 20px;}
+@media only screen and (max-width:800px),
+only screen and (max-device-width:800px)
+{
+.art_content{width:100%;}
+}

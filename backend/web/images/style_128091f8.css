@@ -1,0 +1,90 @@
+@charset "utf-8";
+
+@media only screen and (max-width:1280px),
+only screen and (max-device-width:1280px)
+{
+.case-gallery-wrap {
+	height:600px;
+}
+
+.con_rank_title .title{
+	width: 1020px;
+}
+/*案例下导航按钮*/
+.count-item { margin-left:3%; }
+.c_nav{
+	width: 1020px;
+	line-height: 45px;
+	height: 45px;
+}
+.nav_btn{
+	width: 180px;
+	margin-right: 27px;
+}
+.nav_btn_mar{
+	margin-right: 0;
+}
+/*新版图片列表*/
+.imgbox{
+	width: 323px;
+	margin:0 20px 20px 0;
+	overflow: hidden;
+	float: left;
+}
+.imgbox:nth-child(3n){
+	margin-right: 0;
+}
+.imgbox a{
+	display: block;
+}
+.imgbox a img{
+	width: 100%;
+	height: 100%;
+}
+/*九宫格图片*/
+.case_deputy{
+	display: none;
+}
+.case_img{
+	width: 1010px;
+	margin: 0 auto;
+	margin-top: 33px;
+}
+.img_nav{
+	width:323px;
+	height: 244px;
+	overflow: hidden;
+	float: left;
+	margin: 0 20px 20px 0;
+}
+.img_nav_mar{
+	margin-right: 0;
+}
+.nav_a{
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+.img_nav img{
+	width: 100%;
+	height: 100%;
+}
+.case_bg{
+	position: absolute;
+	left: 0;
+	top: 244px;
+	background: #FFF;
+	background: rgba(0,0,0,0.5);
+	width: 100%;
+	height: 100%;
+}
+.case_bg p{
+	width: 96%;
+	line-height: 40px;
+	padding-left: 4%;
+	background: #00B7EE;
+	position: absolute;
+	bottom: 0;
+}
+}

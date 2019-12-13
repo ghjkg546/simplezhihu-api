@@ -1,0 +1,175 @@
+BODY {
+	PADDING-BOTTOM: 0px; BACKGROUND-COLOR: #eee; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; FONT-FAMILY: "ËÎÌו"; COLOR: #666; FONT-SIZE: 12px; PADDING-TOP: 0px
+}
+UL {
+	PADDING-BOTTOM: 0px; LIST-STYLE-TYPE: none; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+LI {
+	PADDING-BOTTOM: 0px; LIST-STYLE-TYPE: none; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+IMG {
+	BORDER-BOTTOM-STYLE: none; BORDER-RIGHT-STYLE: none; BORDER-TOP-STYLE: none; BORDER-LEFT-STYLE: none
+}
+A {
+	COLOR: #666; TEXT-DECORATION: none
+}
+#pagebody {
+	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 100%; PADDING-RIGHT: 0px; BACKGROUND: url(../../Images/front/headerbg.html) #eee no-repeat center top; HEIGHT: auto; PADDING-TOP: 0px
+}
+#pageheader {
+	POSITION: relative; MARGIN: 0px auto; WIDTH: 1003px; HEIGHT: 86px; PADDING-TOP: 15px; overflow:hidden;
+}
+#pagelogo {
+	WIDTH: 203px; BACKGROUND: url(../../Images/front/logo.html) no-repeat center top; FLOAT: left; HEIGHT: 29px
+}
+#lan {
+	clear:left;POSITION: absolute; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; TOP: 8px; RIGHT: 5px; PADDING-TOP: 0px
+}
+#pagecontent {
+	MARGIN: 0px auto; WIDTH: 1003px
+}
+#pagenews {
+	PADDING-BOTTOM: 0px; MARGIN-TOP: 12px; PADDING-LEFT: 6px; PADDING-RIGHT: 6px; OVERFLOW: hidden; PADDING-TOP: 0px
+}
+.mainnews {
+	BACKGROUND-COLOR: #fff; MARGIN: 0px 3px; WIDTH: 324px; FLOAT: left; HEIGHT: 252px; OVERFLOW: hidden
+}
+H1 {
+	PADDING-BOTTOM: 0px; LINE-HEIGHT: 36px; TEXT-INDENT: 14px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; COLOR: #666; FONT-SIZE: 14px; FONT-WEIGHT: bold; PADDING-TOP: 8px
+}
+.company P {
+	LINE-HEIGHT: 20px; MARGIN: 0px 18px; WIDTH: 288px; BACKGROUND: url(../../Images/front/company.html) no-repeat left top; COLOR: #666; PADDING-TOP: 120px
+}
+.company P A {
+	COLOR: #666
+}
+.company P A:hover {
+	COLOR: #ff7700
+}
+.zhanhui P {
+	LINE-HEIGHT: 20px; MARGIN: 0px 18px; WIDTH: 288px; BACKGROUND: url(../../Images/front/zhanhui.html) no-repeat left top; COLOR: #666; PADDING-TOP: 120px
+}
+.mainnews P A {
+	COLOR: #666
+}
+.mainnews P A:hover {
+	COLOR: #ff7700
+}
+.mainnews UL {
+	LINE-HEIGHT: 20px; MARGIN: 0px 18px; WIDTH: 288px; BACKGROUND: url(../../Images/front/news.html) no-repeat left top; COLOR: #666; PADDING-TOP: 120px
+}
+.mainnews UL LI A {
+	COLOR: #666
+}
+.mainnews UL LI A:hover {
+	COLOR: #ff7700
+}
+.mainnews UL LI SPAN {
+	FLOAT: right
+}
+#pageproduct {
+	MARGIN: 12px 7px 0px; WIDTH: 988px; BACKGROUND: url(../../Images/front/productbg.html) no-repeat left top; HEIGHT: 159px; CLEAR: both
+}
+#footer {
+	PADDING-BOTTOM: 34px; BACKGROUND: url(../../Images/front/footerbg.html) no-repeat center bottom
+}
+#footerfont {
+	PADDING-BOTTOM: 0px; MARGIN: 0px auto; PADDING-LEFT: 0px; WIDTH: 1003px; PADDING-RIGHT: 0px; OVERFLOW: hidden; PADDING-TOP: 0px
+}
+#footerlogo {
+	WIDTH: 600px; DISPLAY: inline; BACKGROUND: url(../../Images/front/footerlogo.html) no-repeat left center; FLOAT: left; HEIGHT: auto; MARGIN-LEFT: 15px
+}
+#footerlogo P {
+	PADDING-LEFT: 190px
+}
+#footersearch {
+	MARGIN-TOP: 30px; WIDTH: 328px; DISPLAY: inline; FLOAT: left; MARGIN-LEFT: 60px
+}
+#footersearch #searchtext {
+	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 146px; PADDING-RIGHT: 0px; HEIGHT: 15px; PADDING-TOP: 0px
+}
+#footersearch #searchsubmit {
+	BORDER-BOTTOM-STYLE: none; PADDING-BOTTOM: 0px; LINE-HEIGHT: 18px; BORDER-RIGHT-STYLE: none; BACKGROUND-COLOR: #ff7700; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 35px; PADDING-RIGHT: 0px; BORDER-TOP-STYLE: none; HEIGHT: 15px; COLOR: #fff; FONT-SIZE: 12px; BORDER-LEFT-STYLE: none; PADDING-TOP: 0px
+}
+#footerlink {
+	PADDING-BOTTOM: 0px; LINE-HEIGHT: 28px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; COLOR: #000; PADDING-TOP: 0px
+}
+#footerlink A {
+	PADDING-BOTTOM: 0px; PADDING-LEFT: 6px; PADDING-RIGHT: 6px; COLOR: #000; PADDING-TOP: 0px
+}
+#footerlink A:hover {
+	COLOR: #ff7700
+}
+.footeraddr {
+	PADDING-BOTTOM: 0px; LINE-HEIGHT: 24px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; COLOR: #666; PADDING-TOP: 0px
+}
+.global_module {
+	POSITION: relative; PADDING-BOTTOM: 1px
+}
+.global_module H3 {
+	DISPLAY: none
+}
+#pageproduct .prolist {
+	POSITION: relative; MARGIN-BOTTOM: 10px; HEIGHT: 135px; OVERFLOW: hidden
+}
+#pageproduct .prolist .prolist_content {
+	POSITION: absolute; PADDING-BOTTOM: 0px; PADDING-LEFT: 8px; WIDTH: 3200px; PADDING-RIGHT: 0px; TOP: 1px; PADDING-TOP: 0px; LEFT: 0px
+}
+#pageproduct .prolist UL {
+	PADDING-BOTTOM: 0px; PADDING-LEFT: 35px; PADDING-RIGHT: 0px; MARGIN-BOTTOM: 10px; FLOAT: left; HEIGHT: 140px; PADDING-TOP: 0px
+}
+#pageproduct .prolist UL LI {
+	TEXT-ALIGN: center; WIDTH: 300px; DISPLAY: inline; FLOAT: left; MARGIN-RIGHT: 0px
+}
+#pageproduct .prolist UL LI A {
+	WIDTH: 142px; FLOAT: left
+}
+.endpro3 {
+	PADDING-RIGHT: 92px
+}
+.endpro6 {
+	PADDING-RIGHT: 92px
+}
+.endpro9 {
+	PADDING-RIGHT: 92px
+}
+.endpro12 {
+	PADDING-RIGHT: 92px
+}
+.endpro15 {
+	PADDING-RIGHT: 92px
+}
+#pageproduct .prolist UL LI SPAN {
+	TEXT-ALIGN: left; MARGIN-TOP: 20px; DISPLAY: block; COLOR: #333; FONT-SIZE: 12px; OVERFLOW: hidden
+}
+#pageproduct .prolist UL LI SPAN A {
+	TEXT-ALIGN: left; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; DISPLAY: block; COLOR: #666; FONT-SIZE: 14px; OVERFLOW: hidden; FONT-WEIGHT: bold; PADDING-TOP: 10px
+}
+#pageproduct .prolist UL LI SPAN P {
+	PADDING-BOTTOM: 0px; LINE-HEIGHT: 18px; MARGIN: 0px; PADDING-LEFT: 4px; PADDING-RIGHT: 4px; COLOR: #666; FONT-SIZE: 12px; PADDING-TOP: 0px
+}
+#pageproduct .prolist UL LI IMG {
+	BORDER-RIGHT-WIDTH: 0px; WIDTH: 140px; DISPLAY: block; BACKGROUND: #eee; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; HEIGHT: 140px; BORDER-LEFT-WIDTH: 0px
+}
+.module_left_right {
+	
+}
+.goRight {
+	POSITION: absolute; TOP: 68px; CURSOR: pointer; RIGHT: 10px
+}
+.goLeft {
+	POSITION: absolute; TOP: 68px; CURSOR: pointer; LEFT: 10px
+}
+.rslides {
+	POSITION: relative; PADDING-BOTTOM: 0px; LIST-STYLE-TYPE: none; MARGIN: 0px; PADDING-LEFT: 0px; WIDTH: 100%; PADDING-RIGHT: 0px; OVERFLOW: hidden; PADDING-TOP: 0px
+}
+.rslides LI {
+	POSITION: absolute; WIDTH: 100%; DISPLAY: none; TOP: 0px; LEFT: 0px
+}
+.rslides LI:first-child {
+	POSITION: relative; DISPLAY: block; FLOAT: left
+}
+.rslides IMG {
+	BORDER-RIGHT-WIDTH: 0px; WIDTH: 100%; DISPLAY: block; FLOAT: left; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; HEIGHT: auto; BORDER-LEFT-WIDTH: 0px
+}
+.clear{ clear:both;}
