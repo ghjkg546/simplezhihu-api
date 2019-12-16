@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use general\components\JwtTool;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -123,6 +124,24 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getId()
     {
+        return 666;
+        $url = Yii::$app->request->getUrl();
+        echo 44;
+        //if (strpos($url, '/wx/') !== false || strpos($url, '/pay-weixinsppay') !== false) {
+            $header = Yii::$app->request->headers;
+            $token = $header->get('token');
+            var_dump($token);
+            if (!empty($token)) {
+                $data = JwtTool::parseToken($token);
+                if (!empty($data)) {
+                    $uid = $data->getClaim('uid');
+                    return $uid;
+                }
+                return null;
+            }
+            return null;
+        //}//小程序uid返回
+
         return $this->getPrimaryKey();
     }
 

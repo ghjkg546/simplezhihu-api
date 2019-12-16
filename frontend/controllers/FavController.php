@@ -1,7 +1,9 @@
 <?php
 namespace frontend\controllers;
 
-use backend\models\ZhihuQuestion;
+use general\components\JwtTool;
+use general\models\ZhihuFavCategory;
+use general\models\ZhihuQuestion;
 use general\models\FollowRelation;
 use general\models\Member;
 use general\models\ZhihuAnswer;
@@ -36,6 +38,7 @@ class FavController extends Controller
                 $questions=ZhihuQuestionViewLog::find()->from(ZhihuQuestionViewLog::tableName().' log')
                     ->select(['question.*','log.view_time'])->innerJoin(ZhihuQuestion::tableName().' question','log.question_id=question.id')
                     ->orderBy('log.view_time desc')
+                    ->where(['user_id'=>JwtTool::getUserId()])
                     ->asArray()->all();
                 foreach ($questions as $k=>$v){
                     $questions[$k]['content'] = mb_substr(strip_tags( $v['content']),0,50);
@@ -45,39 +48,68 @@ class FavController extends Controller
                 break;
 
             case 'fav':
-                $data= ZhihuFav::find()->select(['cate_count' => 'count(*)','category_name'])->groupBy('category_name')->asArray()->all();
+                $data= ZhihuFav::find()->select(['cate_count' => 'count(*)','category_name'])
+                    ->where(['user_id'=>JwtTool::getUserId()])
+                    ->groupBy('category_name')->asArray()->all();
                 return Json::encode($data);
                 break;
         }
 
     }
 
+    /**
+     * 收藏列表
+     * @return string
+     */
     public function actionList()
     {
-        $post=file_get_contents('php://input');
-        $post=Json::decode($post);
-        $answer_ids = ZhihuFav::find()->where(['category_name'=>$post['category_name']])->select(['answer_id'])->column();
-        $qu=ZhihuAnswer::find()
+        $post = file_get_contents('php://input');
+        $post = Json::decode($post);
+        $answer_ids = ZhihuFav::find()->where(['category_name' => $post['category_name']])->select(['answer_id'])->column();
+        $qu = ZhihuAnswer::find()
             ->asArray()
             ->with('vote_member');
-        $uid =Yii::$app->user->id;
+        $uid = Yii::$app->user->id;
         $uid = 1;
-        $ids= FollowRelation::find()->select(['user_id'])->where(['follower_id'=>$uid])->column();
-        $qu->andWhere(['author_id'=>$ids]);
-        $p=$qu->all();
-        $member= Member::find()->indexBy('id')->asArray()->all();
-        foreach ($p as $k=>$v){
-            if(!empty($v['vote_member'])){
-                foreach ($v['vote_member'] as $k1=>$v1){
+        $ids = FollowRelation::find()->select(['user_id'])->where(['follower_id' => $uid])->column();
+        $qu->andWhere(['author_id' => $ids]);
+        $p = $qu->all();
+        $member = Member::find()->indexBy('id')->asArray()->all();
+        foreach ($p as $k => $v) {
+            if (!empty($v['vote_member'])) {
+                foreach ($v['vote_member'] as $k1 => $v1) {
                     $p[$k]['vote_member'][$k1]['name'] = $member[$v1['member_id']]['username'];
                 }
             }
         }
-        foreach ($p as $k=>$v){
-            $p[$k]['voter'] = !empty($v['vote_member'][0]['name'])? $v['vote_member'][0]['name']:'还没人';
+        foreach ($p as $k => $v) {
+            $p[$k]['voter'] = !empty($v['vote_member'][0]['name']) ? $v['vote_member'][0]['name'] : '还没人';
         }
         return Json::encode($p);
+    }
 
+    /**
+     * 添加到收藏
+     * @return string
+     */
+    public function actionAdd()
+    {
+        $post = file_get_contents('php://input');
+        $post = Json::decode($post);
+        $fav = new ZhihuFav();
+        $fav->answer_id = $post['answer_id'];
+        $fav->user_id = JwtTool::getUserId();
+        $fav->category_id = $post['cate_id'];
+        $fav->save();
+        $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
+            ->where(['user_id' => JwtTool::getUserId()])
+            ->groupBy('category_id')->indexBy('category_id')->column();
+        $fav = ZhihuFavCategory::find()->asArray()->all();;
+        foreach ($fav as $k => $v) {
+            $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
+        }
+        $result['fav'] = $fav;
+        return Json::encode(['state' => 1, 'fav' => $fav]);
     }
 
 }

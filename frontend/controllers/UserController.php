@@ -1,13 +1,14 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\FollowRelation;
-use backend\models\Member;
-use backend\models\News;
-use backend\models\Cases;
-use backend\models\RepairRecords;
-use backend\models\wx\WXBizDataCrypt;
+use general\models\Bike;
+use general\models\FollowRelation;
+use general\models\Member;
+use general\models\News;
+use general\models\Cases;
+use general\models\RepairRecords;
+use general\models\wx\WXBizDataCrypt;
+use general\models\ZhihuMember;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -215,22 +216,16 @@ class UserController extends Controller
     public function actionLogin(){
         $data=file_get_contents('php://input');
         $data=Json::decode($data);
-        $name = $data['username'];
+        $name = $data['name'];
         $password = $data['password'];
-        /*$member = Member::find()->where(['username'=>$name,'password'=>md5($password)])->one();
+        $member = ZhihuMember::find()->where(['username'=>$name,'password'=>md5($password)])->one();
         if($member){
-            $token_data = ['uid' => $member->id, 'loginName' => $name ]; //默认sid];
+            $token_data = ['uid' => $member->id, 'login_name' => $name ]; //默认sid];
             $token = static::getToken($token_data);
-            $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name ]; //默认sid];*/
-            //return Json::encode(['state'=>1,'text'=>'','data'=>$data]);
-       // }
-        $data['code']=20000;
-        $data['data']['token']='amdin';
-        return Json::encode($data);
-
-
+            $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name ]; //默认sid];
+            return Json::encode(['state'=>1,'text'=>'','data'=>$data,'toekn'=>$token]);
+        }
         return Json::encode(['state'=>0,'text'=>'错误的用户名密码']);
-
 
 
     }

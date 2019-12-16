@@ -1,16 +1,16 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\FriendLinks;
-use backend\models\Member;
-use backend\models\RepairRecords;
-use backend\models\Category;
-use backend\models\News;
-use backend\models\Cases;
-use backend\models\CaseCate;
-use backend\models\RidingRecord;
-use backend\models\SystemSetting;
+use general\models\Bike;
+use general\models\FriendLinks;
+use general\models\Member;
+use general\models\RepairRecords;
+use general\models\Category;
+use general\models\News;
+use general\models\Cases;
+use general\models\CaseCate;
+use general\models\RidingRecord;
+use general\models\SystemSetting;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;

@@ -1,14 +1,15 @@
 <?php
 namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\ZhihuQuestion;
+use general\components\JwtTool;
+use general\models\Bike;
+use general\models\ZhihuQuestion;
 use general\models\Comment;
 use general\models\FollowRelation;
 use general\models\Member;
-use backend\models\RepairRecords;
-use backend\models\RidingRecord;
-use backend\models\VoteMember;
+use general\models\RepairRecords;
+use general\models\RidingRecord;
+use general\models\VoteMember;
 use general\models\ZhihuAnswer;
 use Yii;
 use yii\helpers\Json;
@@ -88,6 +89,7 @@ class QuestionController extends Controller
         $data=file_get_contents('php://input');
         $data=Json::decode($data);
         $question = ZhihuQuestion::findOne($data['id']);
+        //var_dump(JwtTool::getUserId());
         $answers=ZhihuAnswer::find()
             ->asArray()
             ->where(['question_id'=>$data['id']])

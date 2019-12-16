@@ -1,5 +1,5 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
 use GatewayWorker\Lib\Gateway;
 

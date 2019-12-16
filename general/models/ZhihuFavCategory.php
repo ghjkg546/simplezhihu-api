@@ -5,21 +5,20 @@ namespace general\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%zhihu_fav}}".
+ * This is the model class for table "{{%zhihu_fav_category}}".
  *
  * @property integer $id
- * @property integer $answer_id
- * @property integer $category_id
+ * @property string $category_name
  * @property integer $user_id
  */
-class ZhihuFav extends \yii\db\ActiveRecord
+class ZhihuFavCategory extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%zhihu_fav}}';
+        return '{{%zhihu_fav_category}}';
     }
 
     /**
@@ -28,7 +27,8 @@ class ZhihuFav extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['answer_id', 'category_id', 'user_id'], 'integer'],
+            [['user_id'], 'integer'],
+            [['category_name'], 'string', 'max' => 500],
         ];
     }
 
@@ -39,8 +39,7 @@ class ZhihuFav extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'answer_id' => 'Answer ID',
-            'category_id' => 'Category ID',
+            'category_name' => 'Category Name',
             'user_id' => 'User ID',
         ];
     }

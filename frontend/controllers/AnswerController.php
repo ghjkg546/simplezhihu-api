@@ -1,14 +1,17 @@
 <?php
 namespace frontend\controllers;
 
-use backend\models\Bike;
+use general\components\JwtTool;
+use general\models\Bike;
 use general\models\Comment;
 use general\models\FollowRelation;
 use general\models\Member;
-use backend\models\RepairRecords;
-use backend\models\RidingRecord;
-use backend\models\VoteMember;
+use general\models\RepairRecords;
+use general\models\RidingRecord;
+use general\models\VoteMember;
 use general\models\ZhihuAnswer;
+use general\models\ZhihuFav;
+use general\models\ZhihuFavCategory;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -70,16 +73,26 @@ class AnswerController extends Controller
     {
         $data=file_get_contents('php://input');
         $data=Json::decode($data);
-        $p=ZhihuAnswer::find()
+        $answer=ZhihuAnswer::find()
             ->asArray()
             ->where(['id'=>$data['id']])
             ->one();
-        $uid = Yii::$app->user->id;
-        $p['author'] = Member::findOne($p['author_id']);
+        $user_id = JwtTool::getUserId();
+        $answer['author'] = Member::findOne($answer['author_id']);
 
-        $answer_count = ZhihuAnswer::find()->where(['question_id'=>$p['question_id']])->count();
+        $answer_count = ZhihuAnswer::find()->where(['question_id'=>$answer['question_id']])->count();
         $result['answer_count'] = $answer_count;
-        $result['content'] = $p;
+        $is_fav = ZhihuFav::find()->where(['answer_id'=>$answer['id'],'user_id'=>$user_id]);
+        $result['is_fav'] = !empty($is_fav)?1:0;
+        $result['content'] = $answer;
+        $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)','category_id'])
+            ->where(['user_id'=>$user_id])
+            ->groupBy('category_id')->indexBy('category_id')->column();
+        $fav = ZhihuFavCategory::find()->asArray()->all();;
+        foreach ($fav as $k=>$v){
+            $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']])?$answers_per_cate[$v['id']]:0;
+        }
+        $result['fav'] = $fav;
         return Json::encode($result);
     }
 

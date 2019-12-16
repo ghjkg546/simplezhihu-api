@@ -1,17 +1,17 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\Comment;
-use backend\models\FollowRelation;
-use backend\models\Member;
-use backend\models\News;
-use backend\models\Cases;
-use backend\models\CaseCate;
-use backend\models\RidingRecord;
-use backend\models\Category;
-use backend\models\VoteMember;
-use backend\models\ZhihuAnswer;
+use general\models\Bike;
+use general\models\Comment;
+use general\models\FollowRelation;
+use general\models\Member;
+use general\models\News;
+use general\models\Cases;
+use general\models\CaseCate;
+use general\models\RidingRecord;
+use general\models\Category;
+use general\models\VoteMember;
+use general\models\ZhihuAnswer;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;

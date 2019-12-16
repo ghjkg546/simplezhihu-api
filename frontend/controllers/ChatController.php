@@ -1,10 +1,10 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\ChatRecord;
-use backend\models\Hongbao;
-use backend\models\Member;
+use general\models\Bike;
+use general\models\ChatRecord;
+use general\models\Hongbao;
+use general\models\Member;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;

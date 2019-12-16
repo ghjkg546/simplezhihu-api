@@ -1,16 +1,16 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\Comment;
-use backend\models\FollowRelation;
-use backend\models\Member;
-use backend\models\Banner;
-use backend\models\CaseCate;
-use backend\models\Cases;
-use backend\models\News;
+use general\models\Bike;
+use general\models\Comment;
+use general\models\FollowRelation;
+use general\models\Member;
+use general\models\Banner;
+use general\models\CaseCate;
+use general\models\Cases;
+use general\models\News;
 use yii\web\UploadedFile;
-use backend\models\SystemSetting;
+use general\models\SystemSetting;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;

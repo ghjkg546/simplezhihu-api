@@ -1,11 +1,11 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\FollowRelation;
-use backend\models\Member;
-use backend\models\RepairRecords;
-use backend\models\wx\WXBizDataCrypt;
+use general\models\Bike;
+use general\models\FollowRelation;
+use general\models\Member;
+use general\models\RepairRecords;
+use general\models\wx\WXBizDataCrypt;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;

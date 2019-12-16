@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\controllers;
+namespace frontend\controllers;
 
 use yii\web\UploadedFile;
 use yii\helpers\Json;
@@ -21,7 +21,7 @@ class FilemanagerController extends Controller {
     public $enableCsrfValidation = false;
 
     /* (non-PHPdoc)
-     * @see \backend\components\CController::init()
+     * @see \general\components\CController::init()
      */
 
     public function init() {

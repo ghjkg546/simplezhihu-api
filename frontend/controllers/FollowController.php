@@ -1,16 +1,16 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\Comment;
-use backend\models\FollowRelation;
-use backend\models\Member;
-use backend\models\RepairRecords;
-use backend\models\RidingRecord;
-use backend\models\VoteMember;
-use backend\models\ZhihuAnswer;
-use backend\models\ZhihuFollow;
-use backend\models\ZhihuFollowUser;
+use general\models\Bike;
+use general\models\Comment;
+use general\models\FollowRelation;
+use general\models\Member;
+use general\models\RepairRecords;
+use general\models\RidingRecord;
+use general\models\VoteMember;
+use general\models\ZhihuAnswer;
+use general\models\ZhihuFollow;
+use general\models\ZhihuFollowUser;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;

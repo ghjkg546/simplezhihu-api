@@ -1,10 +1,10 @@
 <?php
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use backend\models\Bike;
-use backend\models\Member;
-use backend\models\RepairRecords;
-use backend\models\RidingRecord;
+use general\models\Bike;
+use general\models\Member;
+use general\models\RepairRecords;
+use general\models\RidingRecord;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
