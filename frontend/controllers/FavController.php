@@ -112,4 +112,24 @@ class FavController extends Controller
         return Json::encode(['state' => 1, 'fav' => $fav]);
     }
 
+    /**
+     * 添加到收藏
+     * @return string
+     */
+    public function actionRemove()
+    {
+        $post = file_get_contents('php://input');
+        $post = Json::decode($post);
+        $count =ZhihuFav::deleteAll(['answer_id'=>$post['answer_id'],'user_id'=>JwtTool::getUserId()]);
+        $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
+            ->where(['user_id' => JwtTool::getUserId()])
+            ->groupBy('category_id')->indexBy('category_id')->column();
+        $fav = ZhihuFavCategory::find()->asArray()->all();;
+        foreach ($fav as $k => $v) {
+            $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
+        }
+        $result['fav'] = $fav;
+        return Json::encode(['state' => $count>0?1:0, 'fav' => $fav]);
+    }
+
 }

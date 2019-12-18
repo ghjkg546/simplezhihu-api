@@ -381,18 +381,18 @@ class Tool {
     public static function get_last_time($targetTime) {
 // 今天最大时间
         $todayLast = strtotime(date('Y-m-d 23:59:59'));
-//$agoTimeTrue = time() - $targetTime;
+        $agoTimeTrue = time() - $targetTime;
         $agoTime = $todayLast - $targetTime;
         $agoDay = floor($agoTime / 86400);
 
-        /* if ($agoTimeTrue < 60) {
+         if ($agoTimeTrue < 60) {
           $result = '刚刚';
           } elseif ($agoTimeTrue < 3600) {
           $result = (ceil($agoTimeTrue / 60)) . '分钟前';
           } elseif ($agoTimeTrue < 3600 * 12) {
           $result = (ceil($agoTimeTrue / 3600)) . '小时前';
-          } elseif */
-        if ($agoDay == 0) {
+          } elseif
+         ($agoDay == 0) {
             $result = '今天 ' . date('H:i', $targetTime);
         } elseif ($agoDay == 1) {
             $result = '昨天 ' . date('H:i', $targetTime);
