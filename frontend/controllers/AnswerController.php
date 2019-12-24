@@ -1,7 +1,9 @@
 <?php
 namespace frontend\controllers;
 
+use backend\models\ZhihuQuestion;
 use general\components\JwtTool;
+use general\components\Tool;
 use general\models\Bike;
 use general\models\Comment;
 use general\models\FollowRelation;
@@ -16,6 +18,7 @@ use general\models\ZhihuFavCategory;
 use general\models\ZhihuMember;
 use general\models\ZhihuNotice;
 use general\models\ZhihuQuestionFollow;
+use Symfony\Component\Console\Question\Question;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -118,10 +121,28 @@ class AnswerController extends Controller
         return Json::encode($p);
     }
 
-    /**
-     * 写回答
-     * @return string
-     */
+    //我的回答
+    public function actionMyAnswerList()
+    {
+        $post = file_get_contents('php://input');
+        $post = Json::decode($post);
+        $page_size = 10;
+        $page = isset($post['page']) ? $post['page'] : 1;
+        $answers_query = ZhihuAnswer::find()
+            ->select(['answer.content', 'answer.create_time', 'question.title', 'answer.id'])
+            ->from(ZhihuAnswer::tableName() . ' answer')
+            ->innerJoin(ZhihuQuestion::tableName() . ' question', 'answer.question_id = question.id')
+            ->where(['answer.author_id' => JwtTool::getUserId()])->limit($page_size)->offset(($page - 1) * $page_size);
+        $clone = clone $answers_query;
+        $count = $clone->count();
+        $answers = $answers_query->asArray()->all();
+        foreach ($answers as $k => $v) {
+            $answers[$k]['create_time'] = Tool::get_last_time($v['create_time']);
+        }
+        return Json::encode(['state' => 1, 'answers' => $answers, 'total_page'=>ceil($count/$page_size)]);
+    }
+
+    //写回答
     public function actionWriteAnswer()
     {
         $data = file_get_contents('php://input');
@@ -133,9 +154,6 @@ class AnswerController extends Controller
         $answer->create_time = time();
         $answer->question_id = $data['question_id'];
         $answer->save();
-
-
-
         $a['state'] = 1;
 
         return Json::encode($a);

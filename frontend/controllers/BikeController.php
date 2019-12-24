@@ -13,7 +13,7 @@ use yii\filters\AccessControl;
 use common\models\LoginForm;
 
 /**
- * Site controller
+ * 小黄车控制器
  */
 class BikeController extends Controller
 {

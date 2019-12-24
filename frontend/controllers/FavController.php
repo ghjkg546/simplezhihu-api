@@ -88,6 +88,7 @@ class FavController extends Controller
         return Json::encode($p);
     }
 
+
     /**
      * 添加到收藏
      * @return string

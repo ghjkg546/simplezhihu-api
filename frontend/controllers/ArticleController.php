@@ -106,6 +106,7 @@ class ArticleController extends Controller
         return Json::encode($res);
     }
 
+
     public function actionGetCates()
     {
 
@@ -153,6 +154,7 @@ class ArticleController extends Controller
     }
 
     public function actionList(){
+
         $data=file_get_contents('php://input');
         $data=Json::decode($data);
         $p=ZhihuAnswer::find()
