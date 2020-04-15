@@ -92,7 +92,6 @@ class QuestionController extends Controller
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
         $question = ZhihuQuestion::findOne($data['id']);
-        //var_dump(JwtTool::getUserId());
         $answers = ZhihuAnswer::find()
             ->asArray()
             ->where(['question_id' => $data['id']])
@@ -105,6 +104,10 @@ class QuestionController extends Controller
         $result['question'] = $question;
         $result['answers'] = $answers;
         $result['follow'] = ZhihuQuestionFollow::find()->where(['question_id' => $data['id'], 'user_id' => JwtTool::getUserId()])->one() ? 1 : 0;
+        $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $data['id']])->count();
+        $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
+        $comment_count = Comment::find()->where(['answer_id'=>array_column($answers,'id')])->count();
+        $result['comment_count'] = !empty($comment_count) ? $comment_count : 0;
         return Json::encode($result);
     }
 
@@ -193,14 +196,22 @@ class QuestionController extends Controller
             $follow->user_id = JwtTool::getUserId();
             $follow->create_time = time();
             $follow->save();
-            return Json::encode(['state' => 1]);
+            $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $post['question_id']])->count();
+            $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
+            return Json::encode(['state' => 1,'follow_count'=>$follow_count]);
         } else {
             ZhihuQuestionFollow::deleteAll(['question_id'=>$post['question_id'],'user_id'=>JwtTool::getUserId()]);
-            return Json::encode(['state' => 0]);
+            $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $post['question_id']])->count();
+            $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
+            return Json::encode(['state' => 0,'follow_count'=>$follow_count]);
         }
 
     }
 
+    /**
+     * 点赞
+     * @return string
+     */
     public function actionVote()
     {
         $data = file_get_contents('php://input');

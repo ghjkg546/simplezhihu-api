@@ -56,5 +56,10 @@ return [
                         Yk/7gkPjqi+fArm4nfuKPWC7HPOTHGMXxzKek3KzCRQadBffe2GV4wN54QQsQw51',
         ],
     ],
+    'modules' => [
+        'api' => [
+            'class' => 'frontend\modules\api\User',
+        ],
+    ],
     'params' => $params,
 ];

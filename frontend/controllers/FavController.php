@@ -26,31 +26,35 @@ class FavController extends Controller
      *
      * @return mixed
      */
-    public $layout=false;
+    public $layout = false;
     public $enableCsrfValidation = false;
 
     public function actionIndex()
     {
-        $post=file_get_contents('php://input');
-        $post=Json::decode($post);
-        switch ($post['type']){
+        $post = file_get_contents('php://input');
+        $post = Json::decode($post);
+        switch ($post['type']) {
             case 'recent':
-                $questions=ZhihuQuestionViewLog::find()->from(ZhihuQuestionViewLog::tableName().' log')
-                    ->select(['question.*','log.view_time'])->innerJoin(ZhihuQuestion::tableName().' question','log.question_id=question.id')
+                $questions = ZhihuQuestionViewLog::find()->from(ZhihuQuestionViewLog::tableName() . ' log')
+                    ->select(['question.*', 'log.view_time'])->innerJoin(ZhihuQuestion::tableName() . ' question', 'log.question_id=question.id')
                     ->orderBy('log.view_time desc')
-                    ->where(['user_id'=>JwtTool::getUserId()])
+                    ->where(['user_id' => JwtTool::getUserId()])
                     ->asArray()->all();
-                foreach ($questions as $k=>$v){
-                    $questions[$k]['content'] = mb_substr(strip_tags( $v['content']),0,50);
+                foreach ($questions as $k => $v) {
+                    $questions[$k]['content'] = mb_substr(strip_tags($v['content']), 0, 50);
 
                 }
                 return Json::encode($questions);
                 break;
 
             case 'fav':
-                $data= ZhihuFav::find()->select(['cate_count' => 'count(*)','category_name'])
-                    ->where(['user_id'=>JwtTool::getUserId()])
-                    ->groupBy('category_name')->asArray()->all();
+                $data = ZhihuFav::find()->select(['cate_count' => 'count(*)', 'category_id'])
+                    ->where(['user_id' => JwtTool::getUserId()])
+                    ->groupBy('category_id')->asArray()->all();
+                $category = ZhihuFavCategory::find()->select(['category_name'])->indexBy('id')->column();
+                foreach ($data as $k => $v) {
+                    $data[$k]['category_name'] = isset($category[$v['category_id']]) ? $category[$v['category_id']] : '';
+                }
                 return Json::encode($data);
                 break;
         }
@@ -65,11 +69,10 @@ class FavController extends Controller
     {
         $post = file_get_contents('php://input');
         $post = Json::decode($post);
-        $answer_ids = ZhihuFav::find()->where(['category_name' => $post['category_name']])->select(['answer_id'])->column();
+        $answer_ids = ZhihuFav::find()->where(['category_id' => $post['category_id']])->select(['answer_id'])->column();
         $qu = ZhihuAnswer::find()
             ->asArray()
             ->with('vote_member');
-        $uid = Yii::$app->user->id;
         $uid = 1;
         $ids = FollowRelation::find()->select(['user_id'])->where(['follower_id' => $uid])->column();
         $qu->andWhere(['author_id' => $ids]);
@@ -121,7 +124,7 @@ class FavController extends Controller
     {
         $post = file_get_contents('php://input');
         $post = Json::decode($post);
-        $count =ZhihuFav::deleteAll(['answer_id'=>$post['answer_id'],'user_id'=>JwtTool::getUserId()]);
+        $count = ZhihuFav::deleteAll(['answer_id' => $post['answer_id'], 'user_id' => JwtTool::getUserId()]);
         $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
             ->where(['user_id' => JwtTool::getUserId()])
             ->groupBy('category_id')->indexBy('category_id')->column();
@@ -130,7 +133,7 @@ class FavController extends Controller
             $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
         }
         $result['fav'] = $fav;
-        return Json::encode(['state' => $count>0?1:0, 'fav' => $fav]);
+        return Json::encode(['state' => $count > 0 ? 1 : 0, 'fav' => $fav]);
     }
 
 }

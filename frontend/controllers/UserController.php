@@ -1,6 +1,8 @@
 <?php
 namespace frontend\controllers;
 
+use backend\models\ZhihuFollowUser;
+use general\components\JwtTool;
 use general\models\Bike;
 use general\models\FollowRelation;
 use general\models\Member;
@@ -8,7 +10,10 @@ use general\models\News;
 use general\models\Cases;
 use general\models\RepairRecords;
 use general\models\wx\WXBizDataCrypt;
+use general\models\ZhihuAnswer;
+use general\models\ZhihuFav;
 use general\models\ZhihuMember;
+use general\models\ZhihuQuestionViewLog;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -28,7 +33,7 @@ class UserController extends Controller
      *
      * @return string
      */
-    public $layout=false;
+    public $layout = false;
     public $enableCsrfValidation = false;
 
     public function init()
@@ -44,67 +49,81 @@ class UserController extends Controller
     }
 
 
-    public function actionCharge(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $member = Member::findOne(1);
-        $member->money += $data['money'];
-        $member->save();
-        echo 1;exit;
+    public function actionInfo()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $user_id = JwtTool::getUserId();
+        $user = ZhihuMember::findOne(['id' => $user_id]);
+        $answer_count = ZhihuAnswer::find()->where(['author_id' => $user_id])->count();
+        $follow_count = ZhihuFollowUser::find()->where(['user_id' => $user_id])->count();
+        $fav_count = ZhihuFav::find()->where(['user_id' => $user_id])->count();
+        $view_count = ZhihuQuestionViewLog::find()->where(['user_id' => $user_id])->count();
+        return Json::encode([
+            'state' => 1, 'answer_count' => $answer_count, 'follow_count' =>
+                $follow_count, 'fav_count' => $fav_count, 'view_count' => $view_count, 'user' => $user
+        ]);
     }
 
-    public function actionBikepos(){
-        $bikes= Bike::find()->asArray()->all();
-        foreach ($bikes as $k=>$v){
+    public function actionBikepos()
+    {
+        $bikes = Bike::find()->asArray()->all();
+        foreach ($bikes as $k => $v) {
             unset($bikes[$k]['bike_number']);
-            $bikes[$k]['id']=intval($bikes[$k]['id']);
-            $bikes[$k]['iconPath']='../images/markers.png';
-            $bikes[$k]['width']=45;
-            $bikes[$k]['height']=50;
-            $bikes[$k]['latitude']=floatval($bikes[$k]['latitude']);
-            $bikes[$k]['longitude']=floatval($bikes[$k]['longitude']);
+            $bikes[$k]['id'] = intval($bikes[$k]['id']);
+            $bikes[$k]['iconPath'] = '../images/markers.png';
+            $bikes[$k]['width'] = 45;
+            $bikes[$k]['height'] = 50;
+            $bikes[$k]['latitude'] = floatval($bikes[$k]['latitude']);
+            $bikes[$k]['longitude'] = floatval($bikes[$k]['longitude']);
         }
         return Json::encode($bikes);
     }
 
-    public function actionRepairhistory(){
-        $data= RepairRecords::find()->where(['member_id'=>1])->select('title')->scalar();
+    public function actionRepairhistory()
+    {
+        $data = RepairRecords::find()->where(['member_id' => 1])->select('title')->scalar();
         return Json::encode($data);
     }
 
-    public function actionReturndeposi(){
-        Member::updateAll(['deposit'=>0],['id'=>1]);
-        echo 1;exit;
+    public function actionReturndeposi()
+    {
+        Member::updateAll(['deposit' => 0], ['id' => 1]);
+        echo 1;
+        exit;
     }
 
-    public function actionList(){
+    public function actionList()
+    {
 
-        $data['status'] =200;
+        $data['status'] = 200;
         $users = Member::find()->asArray()->all();
         $data['data']['lists'] = $users;
         $data['data']['total'] = 2;
         return Json::encode($data);
     }
 
-    public function actionAdd(){
-        $a=file_get_contents("php://input");
-        $b=Json::decode($a);
-        $member=new Member();
-        $member->username=$b['name'];
-        $member->money =$b['money'];
+    public function actionAdd()
+    {
+        $a = file_get_contents("php://input");
+        $b = Json::decode($a);
+        $member = new Member();
+        $member->username = $b['name'];
+        $member->money = $b['money'];
         //$member->
     }
 
-    public function actionEdit(){
-        $a=file_get_contents("php://input");
-        $b=Json::decode($a);
-        $b=$b['data'];
-        if(!empty($b)){
-            $member= Member::findOne($b['id']);
+    public function actionEdit()
+    {
+        $a = file_get_contents("php://input");
+        $b = Json::decode($a);
+        $b = $b['data'];
+        if (!empty($b)) {
+            $member = Member::findOne($b['id']);
             $member->username = $b['name'];
-            $member->money=$b['money'];
+            $member->money = $b['money'];
             $member->save(false);
-            $data['status'] =200;
+            $data['status'] = 200;
 
             $users = Member::find()->asArray()->all();
             $data['data']['lists'] = $users;
@@ -114,11 +133,12 @@ class UserController extends Controller
 
     }
 
-    public function actionDelete(){
-        $a=file_get_contents("php://input");
-        $b=Json::decode($a);
-        Member::deleteAll(['id'=>$b['id']]);
-        $data['status'] =200;
+    public function actionDelete()
+    {
+        $a = file_get_contents("php://input");
+        $b = Json::decode($a);
+        Member::deleteAll(['id' => $b['id']]);
+        $data['status'] = 200;
 
         $users = Member::find()->asArray()->all();
         $data['data']['lists'] = $users;
@@ -126,7 +146,8 @@ class UserController extends Controller
         return Json::encode($data);
     }
 
-    public function actionChat(){
+    public function actionChat()
+    {
         return $this->render($this->action->id);
     }
 
@@ -134,17 +155,18 @@ class UserController extends Controller
     public function actionRepair1()
     {
 
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $repaire_record=new RepairRecords();
-        $repaire_record->pic_url = implode($data['picUrls'],',');
-        $repaire_record->title =implode($data['repairReason'],',');
-        $repaire_record->bike_number=$data['bikeNumber'];
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $repaire_record = new RepairRecords();
+        $repaire_record->pic_url = implode($data['picUrls'], ',');
+        $repaire_record->title = implode($data['repairReason'], ',');
+        $repaire_record->bike_number = $data['bikeNumber'];
         $repaire_record->remarks = $data['desc'];
-        if(!$repaire_record->save(false)){
-            echo 0;exit;
+        if (!$repaire_record->save(false)) {
+            echo 0;
+            exit;
         }
-        $data['msg']='报障成功';
+        $data['msg'] = '报障成功';
         return Json::encode($data);
     }
 
@@ -157,8 +179,8 @@ class UserController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-        $data['code']=20000;
-        $data['data']='success';
+        $data['code'] = 20000;
+        $data['data'] = 'success';
         return Json::encode($data);
 
         return $this->goHome();
@@ -169,9 +191,10 @@ class UserController extends Controller
      * 返回从微信服务器解密到的用户信息
      * @return array|mixed
      */
-    public function actionGetuserdata(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
+    public function actionGetuserdata()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $js_code = $data['code'];
         $encryptedData = $data['encryptedData'];
         $iv = $data['iv'];
@@ -180,8 +203,9 @@ class UserController extends Controller
         $secret = Yii::$app->params['wx']['secret'];
         $url = "https://api.weixin.qq.com/sns/jscode2session?appid={$appid}&secret={$secret}&js_code={$js_code}&grant_type=authorization_code";
         $response = json_decode(static::curl_get($url), true);
-        if (!empty($response['errcode'])){
-            print_r($response['errmsg']);exit;
+        if (!empty($response['errcode'])) {
+            print_r($response['errmsg']);
+            exit;
         }
         $session = Yii::$app->session;
         if (!$session->isActive) {
@@ -191,7 +215,9 @@ class UserController extends Controller
         $pc = new WXBizDataCrypt($appid, $sessionKey);
         $errCode = $pc->decryptData($encryptedData, $iv, $data);
 
-        if ($errCode != 0) {print_r($errCode);exit;
+        if ($errCode != 0) {
+            print_r($errCode);
+            exit;
         }
         return $data;
         $data = json_decode($data, true);
@@ -200,7 +226,8 @@ class UserController extends Controller
         return $data;
     }
 
-    public static function curl_get($url){
+    public static function curl_get($url)
+    {
         $curl = curl_init(); // 启动一个CURL会话
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HEADER, 0);
@@ -213,159 +240,176 @@ class UserController extends Controller
         return $tmpInfo;    //返回json对象
     }
 
-    public function actionLogin(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
+    public function actionLogin()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $name = $data['name'];
         $password = $data['password'];
-        $member = ZhihuMember::find()->where(['username'=>$name,'password'=>md5($password)])->one();
-        if($member){
-            $token_data = ['uid' => $member->id, 'login_name' => $name ]; //默认sid];
+        $member = ZhihuMember::find()->where(['username' => $name, 'password' => md5($password)])->one();
+        if ($member) {
+            $token_data = ['uid' => $member->id, 'login_name' => $name]; //默认sid];
             $token = static::getToken($token_data);
-            $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name ]; //默认sid];
-            return Json::encode(['state'=>1,'text'=>'','data'=>$data,'toekn'=>$token]);
+            $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name]; //默认sid];
+            return Json::encode(['state' => 1, 'text' => '', 'data' => $data, 'toekn' => $token]);
         }
-        return Json::encode(['state'=>0,'text'=>'错误的用户名密码']);
+        return Json::encode(['state' => 0, 'text' => '错误的用户名密码']);
 
 
     }
 
-    public function actionInfo(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $name = $data['username'];
-        $password = $data['password'];
-        /*$member = Member::find()->where(['username'=>$name,'password'=>md5($password)])->one();
-        if($member){
-            $token_data = ['uid' => $member->id, 'loginName' => $name ]; //默认sid];
-            $token = static::getToken($token_data);
-            $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name ]; //默认sid];*/
-        //return Json::encode(['state'=>1,'text'=>'','data'=>$data]);
-        // }
-        $data['code']=20000;
-        $data['data']['avatar']='https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif';
-        $data['data']['name']='xiaojie';
-        $data['data']['roles']='admin';
-        return Json::encode($data);
-
-
-        return Json::encode(['state'=>0,'text'=>'错误的用户名密码']);
-
-
-
-    }
-
-    public function actionTable(){
+    public function actionTable()
+    {
 
         $keyword = Yii::$app->request->get('keyword');
-        $limit = Yii::$app->request->get('pagesize',10);
-        $page = Yii::$app->request->get('page',1);
-        $offset = ($page-1)*$limit;
+        $limit = Yii::$app->request->get('pagesize', 10);
+        $page = Yii::$app->request->get('page', 1);
+        $offset = ($page - 1) * $limit;
 
         $list = News::find()->asArray()
-       ->limit($limit)
-        ->offset($offset)
-        ->andFilterWhere(['like','title',$keyword])
-        ->all();
-        foreach ($list as $k=>$v){
-            $list[$k]['content'] = mb_substr(strip_tags($v['content']),0,50);
-            $list[$k]['create_time'] = date('Y-m-d H:i',$v['create_time']);
+            ->limit($limit)
+            ->offset($offset)
+            ->andFilterWhere(['like', 'title', $keyword])
+            ->all();
+        foreach ($list as $k => $v) {
+            $list[$k]['content'] = mb_substr(strip_tags($v['content']), 0, 50);
+            $list[$k]['create_time'] = date('Y-m-d H:i', $v['create_time']);
         }
-        $data['code']=20000;
-        $data['data']=$list;
+        $data['code'] = 20000;
+        $data['data'] = $list;
         return Json::encode($data);
 
 
-        return Json::encode(['state'=>0,'text'=>'错误的用户名密码']);
+        return Json::encode(['state' => 0, 'text' => '错误的用户名密码']);
 
     }
 
-    public function actionCaseList(){
+    public function actionCaseList()
+    {
 
         $keyword = Yii::$app->request->get('keyword');
-        $limit = Yii::$app->request->get('pagesize',10);
-        $page = Yii::$app->request->get('page',1);
-        $offset = ($page-1)*$limit;
+        $limit = Yii::$app->request->get('pagesize', 10);
+        $page = Yii::$app->request->get('page', 1);
+        $offset = ($page - 1) * $limit;
 
         $list = Cases::find()->asArray()
-        ->limit($limit)
-        ->offset($offset)
-        ->andFilterWhere(['like','title',$keyword])
-        ->all();
-        foreach ($list as $k=>$v){
-            $list[$k]['content'] = mb_substr(strip_tags($v['content']),0,50);
-            $list[$k]['create_time'] = date('Y-m-d H:i',$v['create_time']);
+            ->limit($limit)
+            ->offset($offset)
+            ->andFilterWhere(['like', 'title', $keyword])
+            ->all();
+        foreach ($list as $k => $v) {
+            $list[$k]['content'] = mb_substr(strip_tags($v['content']), 0, 50);
+            $list[$k]['create_time'] = date('Y-m-d H:i', $v['create_time']);
         }
-        $data['code']=20000;
-        $data['data']=$list;
+        $data['code'] = 20000;
+        $data['data'] = $list;
         return Json::encode($data);
 
 
-        return Json::encode(['state'=>0,'text'=>'错误的用户名密码']);
+        return Json::encode(['state' => 0, 'text' => '错误的用户名密码']);
 
     }
 
-    public function actionDeleteTable(){
+    public function actionDeleteTable()
+    {
 
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $id = $data['id'];
-        $limit = Yii::$app->request->get('pagesize',10);
-        $page = Yii::$app->request->get('page',1);
-        $offset = ($page-1)*$limit;
-        News::deleteAll(['id'=>$id]);
-        
+        $limit = Yii::$app->request->get('pagesize', 10);
+        $page = Yii::$app->request->get('page', 1);
+        $offset = ($page - 1) * $limit;
+        News::deleteAll(['id' => $id]);
+
         $list = News::find()->asArray()
-        ->limit($limit)
-        ->offset($offset)
-        ->all();
-        foreach ($list as $k=>$v){
-            $list[$k]['content'] = mb_substr($v['content'],0,50);
-            $list[$k]['create_time'] = date('Y-m-d H:i',$v['create_time']);
+            ->limit($limit)
+            ->offset($offset)
+            ->all();
+        foreach ($list as $k => $v) {
+            $list[$k]['content'] = mb_substr($v['content'], 0, 50);
+            $list[$k]['create_time'] = date('Y-m-d H:i', $v['create_time']);
         }
-        $data['code']=20000;
-        $data['data']=$list;
+        $data['code'] = 20000;
+        $data['data'] = $list;
         return Json::encode($data);
 
 
-        return Json::encode(['state'=>0,'text'=>'错误的用户名密码']);
+        return Json::encode(['state' => 0, 'text' => '错误的用户名密码']);
 
     }
 
-    public function actionDeleteCase(){
-
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
+    public function actionDeleteCase()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $id = $data['id'];
-        $limit = Yii::$app->request->get('pagesize',10);
-        $page = Yii::$app->request->get('page',1);
-        $offset = ($page-1)*$limit;
-        Cases::deleteAll(['id'=>$id]);
-        
+        $limit = Yii::$app->request->get('pagesize', 10);
+        $page = Yii::$app->request->get('page', 1);
+        $offset = ($page - 1) * $limit;
+        Cases::deleteAll(['id' => $id]);
+
         $list = Cases::find()->asArray()
-        ->limit($limit)
-        ->offset($offset)
-        ->all();
-        foreach ($list as $k=>$v){
-            $list[$k]['content'] = mb_substr($v['content'],0,50);
-            $list[$k]['create_time'] = date('Y-m-d H:i',$v['create_time']);
+            ->limit($limit)
+            ->offset($offset)
+            ->all();
+        foreach ($list as $k => $v) {
+            $list[$k]['content'] = mb_substr($v['content'], 0, 50);
+            $list[$k]['create_time'] = date('Y-m-d H:i', $v['create_time']);
         }
-        $data['code']=20000;
-        $data['data']=$list;
+        $data['code'] = 20000;
+        $data['data'] = $list;
         return Json::encode($data);
 
     }
 
-    public function actionFollowList(){
-        $uid = Yii::$app->user->id;
-        $res=FollowRelation::find()
-            ->select(['m.username','m.id','m.brief','m.avatar'])
-            ->from(FollowRelation::tableName().' fr')
-            ->innerJoin(Member::tableName().' m', 'm.id=fr.user_id')
-            ->where(['follower_id'=>$uid])->asArray()->all();
+    /**
+     * 关注列表
+     * @return string
+     */
+    public function actionFollowList()
+    {
+        $header = Yii::$app->request->headers;
+        $token = $header->get('token');
+        $res = FollowRelation::find()
+            ->select(['m.username', 'm.id', 'm.brief', 'm.avatar'])
+            ->from(FollowRelation::tableName() . ' fr')
+            ->innerJoin(Member::tableName() . ' m', 'm.id=fr.user_id')
+            ->where(['follower_id' => JwtTool::parseToken($token)])->asArray()->all();
         $a['state'] = 1;
         $a['data'] = $res;
         return Json::encode($a);
+    }
+
+    public function actionFollowAuthor()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $author_id = $data['author_id'];
+        $fl = new FollowRelation();
+        $fl->user_id = $author_id;
+        $header = Yii::$app->request->headers;
+        $token = $header->get('token');
+        $fl->follower_id = JwtTool::parseToken($token);
+        $fl->save();
+        $p['state'] = 1;
+        return Json::encode($p);
+    }
+
+    public function actionCancelFollow()
+    {
+        $uid = Yii::$app->user->id;
+        if (empty($uid)) {
+            $uid = 1;
+        }
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        FollowRelation::deleteAll(['follower_id'=>$uid,'user_id'=>$data['id']]);
+        $res = FollowRelation::find()
+            ->select(['m.username', 'm.id', 'm.brief', 'm.avatar'])
+            ->from(FollowRelation::tableName() . ' fr')
+            ->innerJoin(Member::tableName() . ' m', 'm.id=fr.user_id')
+            ->where(['follower_id' => $uid])->asArray()->all();
+        return Json::encode(['code' => 0, 'data' => $res]);
     }
 
 
@@ -377,9 +421,9 @@ class UserController extends Controller
     public static function getToken($data)
     {
         $token1 = Yii::$app->jwt->getBuilder()->setIssuer('jztw.com')// Configures the issuer (iss claim)
-        ->setIssuedAt(time()) // Configures the time that the token was issue (iat claim)
+        ->setIssuedAt(time())// Configures the time that the token was issue (iat claim)
         //->setNotBefore(time() + 60) // Configures the time before which the token cannot be accepted (nbf claim)
-        ->setExpiration(time() + 3600*3); // 过期时间
+        ->setExpiration(time() + 3600 * 3); // 过期时间
         foreach ($data as $k => $v) {
             $token1->set($k, $v);
         }

@@ -19,7 +19,7 @@ class JwtTool {
      * @param $field 字段，如传入sid,返回店铺id
      * @return mixed
      */
-    public static function parseToken($token, $field = null)
+    public static function parseToken($token, $field = 'uid')
     {
         try {
             if (!is_string($token)) {
@@ -46,10 +46,9 @@ class JwtTool {
         $header = Yii::$app->request->headers;
         $token = $header->get('token');
         if (!empty($token)) {
-            $data = JwtTool::parseToken($token);
+            $data = JwtTool::parseToken($token,'uid');
             if (!empty($data)) {
-                $uid = $data->getClaim('uid');
-                return $uid;
+                return $data;
             }
             return null;
         }

@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property string $category_name
  * @property integer $user_id
+ * @property integer $parent_id
  */
 class ZhihuFavCategory extends \yii\db\ActiveRecord
 {
@@ -27,7 +28,7 @@ class ZhihuFavCategory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id'], 'integer'],
+            [['user_id', 'parent_id'], 'integer'],
             [['category_name'], 'string', 'max' => 500],
         ];
     }
@@ -41,6 +42,7 @@ class ZhihuFavCategory extends \yii\db\ActiveRecord
             'id' => 'ID',
             'category_name' => 'Category Name',
             'user_id' => 'User ID',
+            'parent_id' => 'Parent ID',
         ];
     }
 }
