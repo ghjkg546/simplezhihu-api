@@ -3,7 +3,7 @@ namespace frontend\controllers;
 
 use general\models\ArticleComment;
 use general\models\Bike;
-use general\models\Comment;
+use general\models\ZhihuComment;
 use general\models\FollowRelation;
 use general\models\Member;
 use general\models\News;
@@ -84,7 +84,7 @@ class ArticleController extends Controller
         $data = file_get_contents('php://input');
         $post = Json::decode($data);
         $article = ZhihuArticle::findOne(15);
-        $res = Comment::find()
+        $res = ZhihuComment::find()
             ->with('author')
             ->where(['answer_id' => 1])->asArray()->all();
         foreach ($res as $k => $v) {
@@ -197,6 +197,7 @@ class ArticleController extends Controller
             $p[$k]['timestamp'] = time();
             $p[$k]['platforms'] = ['aa'];
             $p[$k]['status'] = 'deleted';
+            $p[$k]['cover_img'] = !empty($p[$k]['cover_img']) ? Yii::$app->request->getHostInfo() . $p[$k]['cover_img'] : '';
         }
         $data['code'] = 20000;
         $data['data']['items'] = $p;
@@ -213,6 +214,8 @@ class ArticleController extends Controller
 
         $author = Member::findOne($detail['author_id'])->toArray();
         $detail['author'] = $author;
+        $detail['create_time'] = date('Y-m-d',$detail['create_time']);
+        $detail['cover_img'] = !empty($detail['cover_img']) ? Yii::$app->request->getHostInfo() . $detail['cover_img'] : '';
         $detail['comments'] = ArticleComment::find()->where(['article_id' => $data['id']])->asArray()->all();
         $data['code'] = 20000;
         $data['data'] = $detail;
@@ -276,7 +279,7 @@ class ArticleController extends Controller
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
         $answer_id = $data['id'];
-        $res = Comment::find()
+        $res = ZhihuComment::find()
             ->with('author')
             ->where(['answer_id' => $answer_id])->asArray()->all();
         foreach ($res as $k => $v) {
@@ -290,7 +293,7 @@ class ArticleController extends Controller
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
         $answer_id = $data['id'];
-        $commnet = new Comment();
+        $commnet = new ZhihuComment();
         $commnet->author_id = 1;
         $commnet->create_time = time();
         $commnet->vote_count = 0;
@@ -300,7 +303,7 @@ class ArticleController extends Controller
             $res['text'] = $commnet->getErrors();
             return Json::encode($res);
         }
-        $res = Comment::find()
+        $res = ZhihuComment::find()
             ->with('author')
             ->where(['answer_id' => $answer_id])->asArray()->all();
         foreach ($res as $k => $v) {
@@ -333,10 +336,10 @@ class ArticleController extends Controller
         $data = Json::decode($data);
         $answer_id = $data['id'];
         $comment_id = $data['comment_id'];
-        $answer = Comment::findOne($comment_id);
+        $answer = ZhihuComment::findOne($comment_id);
         $answer->vote_count += 1;
         $answer->save();
-        $res = Comment::find()
+        $res = ZhihuComment::find()
             ->with('author')
             ->where(['answer_id' => $answer_id])->asArray()->all();
         foreach ($res as $k => $v) {

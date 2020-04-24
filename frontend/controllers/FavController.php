@@ -62,7 +62,7 @@ class FavController extends Controller
     }
 
     /**
-     * 收藏列表
+     * 收藏答案列表
      * @return string
      */
     public function actionList()
@@ -71,24 +71,17 @@ class FavController extends Controller
         $post = Json::decode($post);
         $answer_ids = ZhihuFav::find()->where(['category_id' => $post['category_id']])->select(['answer_id'])->column();
         $qu = ZhihuAnswer::find()
-            ->asArray()
-            ->with('vote_member');
-        $uid = 1;
-        $ids = FollowRelation::find()->select(['user_id'])->where(['follower_id' => $uid])->column();
-        $qu->andWhere(['author_id' => $ids]);
-        $p = $qu->all();
-        $member = Member::find()->indexBy('id')->asArray()->all();
-        foreach ($p as $k => $v) {
-            if (!empty($v['vote_member'])) {
-                foreach ($v['vote_member'] as $k1 => $v1) {
-                    $p[$k]['vote_member'][$k1]['name'] = $member[$v1['member_id']]['username'];
-                }
-            }
+            ->asArray();
+        $qu->andWhere(['id' => $answer_ids]);
+
+        $answers = $qu->all();
+        $question_titles = ZhihuQuestion::find()->select('title')
+            ->where(['id'=>array_unique(array_column($answers,'question_id'))])->indexBy('id')->column();
+        foreach ($answers as $k=>$v){
+            $answers[$k]['question_title']= $question_titles[$v['question_id']];
+            $answers[$k]['content'] = mb_substr(strip_tags($v['content']),0,100);
         }
-        foreach ($p as $k => $v) {
-            $p[$k]['voter'] = !empty($v['vote_member'][0]['name']) ? $v['vote_member'][0]['name'] : '还没人';
-        }
-        return Json::encode($p);
+        return Json::encode($answers);
     }
 
 
@@ -120,6 +113,29 @@ class FavController extends Controller
      * 添加到收藏
      * @return string
      */
+    public function actionAddNewFolder()
+    {
+        $post = file_get_contents('php://input');
+        $post = Json::decode($post);
+        $fav_cate = new ZhihuFavCategory();
+        $fav_cate->user_id = JwtTool::getUserId();
+        $fav_cate->category_name = $post['category_name'];
+        $fav_cate->save();
+        $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
+            ->where(['user_id' => JwtTool::getUserId()])
+            ->groupBy('category_id')->indexBy('category_id')->column();
+        $fav = ZhihuFavCategory::find()->asArray()->all();;
+        foreach ($fav as $k => $v) {
+            $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
+        }
+        $result['fav'] = $fav;
+        return Json::encode(['state' => 1, 'fav' => $fav]);
+    }
+
+    /**
+     * 取消收藏
+     * @return string
+     */
     public function actionRemove()
     {
         $post = file_get_contents('php://input');
@@ -128,7 +144,7 @@ class FavController extends Controller
         $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
             ->where(['user_id' => JwtTool::getUserId()])
             ->groupBy('category_id')->indexBy('category_id')->column();
-        $fav = ZhihuFavCategory::find()->asArray()->all();;
+        $fav = ZhihuFavCategory::find()->asArray()->where(['user_id'=>JwtTool::getUserId()])->all();;
         foreach ($fav as $k => $v) {
             $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
         }

@@ -1,8 +1,11 @@
 <?php
 namespace frontend\controllers;
 
+use backend\models\ZhihuQuestion;
+use general\components\JwtTool;
 use general\models\Bike;
-use general\models\Comment;
+use general\models\ZhihuAnswerFollow;
+use general\models\ZhihuComment;
 use general\models\FollowRelation;
 use general\models\Member;
 use general\models\RepairRecords;
@@ -11,6 +14,7 @@ use general\models\VoteMember;
 use general\models\ZhihuAnswer;
 use general\models\ZhihuFollow;
 use general\models\ZhihuFollowUser;
+use general\models\ZhihuQuestionFollow;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -23,14 +27,14 @@ use common\models\LoginForm;
  */
 class FollowController extends Controller
 {
-    
+
 
     /**
      * Displays homepage.
      *
      * @return string
      */
-    public $layout=false;
+    public $layout = false;
     public $enableCsrfValidation = false;
 
     public function init()
@@ -40,160 +44,134 @@ class FollowController extends Controller
 
     public function actionIndex()
     {
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $type = $data['type'];
-        $qu=ZhihuFollow::find();
-        if($type ==1){
+        $qu = ZhihuFollow::find();
+        if ($type == 1) {
             $qu->orderBy('up_count desc');
-        }elseif ($type ==0){
-            $uid =Yii::$app->user->id;
-            $ids= FollowRelation::find()->select(['user_id'])->where(['follower_id'=>$uid])->column();
-            $qu->andWhere(['author_id'=>$ids]);
-        } elseif ($type==4){
+        } elseif ($type == 0) {
+            $uid = Yii::$app->user->id;
+            $ids = FollowRelation::find()->select(['user_id'])->where(['follower_id' => $uid])->column();
+            $qu->andWhere(['author_id' => $ids]);
+        } elseif ($type == 4) {
             $a = ZhihuFollowUser::find()
-                ->from(ZhihuFollowUser::tableName().' follow')
-                ->select(['member.*','follow.*'])
-                ->innerJoin(Member::tableName().' member','member.id=follow.user_id')
-                ->where(['user_id'=>1])->asArray()->all();
-            foreach ($a as $k=>$v){
-                $a[$k]['is_follow']=1;
+                ->from(ZhihuFollowUser::tableName() . ' follow')
+                ->select(['member.*', 'follow.*'])
+                ->innerJoin(Member::tableName() . ' member', 'member.id=follow.user_id')
+                ->where(['user_id' => 1])->asArray()->all();
+            foreach ($a as $k => $v) {
+                $a[$k]['is_follow'] = 1;
             }
             return Json::encode($a);
         }
-         $p=$qu->all();
-        $member= Member::find()->indexBy('id')->asArray()->all();
-        foreach ($p as $k=>$v){
-            if(!empty($v['vote_member'])){
-                foreach ($v['vote_member'] as $k1=>$v1){
+        $p = $qu->all();
+        $member = Member::find()->indexBy('id')->asArray()->all();
+        foreach ($p as $k => $v) {
+            if (!empty($v['vote_member'])) {
+                foreach ($v['vote_member'] as $k1 => $v1) {
                     $p[$k]['vote_member'][$k1]['name'] = $member[$v1['member_id']]['username'];
                 }
             }
         }
-        foreach ($p as $k=>$v){
-            $p[$k]['voter'] = !empty($v['vote_member'][0]['name'])? $v['vote_member'][0]['name']:'还没人';
+        foreach ($p as $k => $v) {
+            $p[$k]['voter'] = !empty($v['vote_member'][0]['name']) ? $v['vote_member'][0]['name'] : '还没人';
         }
         return Json::encode($p);
     }
 
     public function actionDetail()
     {
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $p=ZhihuAnswer::find()
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $p = ZhihuAnswer::find()
             ->asArray()
-            ->where(['id'=>$data['id']])
+            ->where(['id' => $data['id']])
             ->one();
         $uid = Yii::$app->user->id;
         $p['author'] = Member::findOne($p['author_id']);
         return Json::encode($p);
     }
 
-    public function actionAnswerlist(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $p=ZhihuAnswer::find()
+    public function actionAnswerlist()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $p = ZhihuAnswer::find()
             ->asArray()
-            ->where(['answer_id'=>$data['id']])
+            ->where(['answer_id' => $data['id']])
             ->asArray()->all();
         $authors = Member::find()->select(['username'])->indexBy('id')->column();
-        foreach ($p as $k=>$v){
+        foreach ($p as $k => $v) {
             $p[$k]['author_name'] = $authors[$v['author_id']];
-            $p[$k]['up_count'] = empty($v['up_count'])?0:$v['up_count'];
+            $p[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
         $uid = Yii::$app->user->id;
         return Json::encode($p);
     }
 
-    public function actionWriteanswer(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $author_id =1 ;
+    public function actionWriteanswer()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $author_id = 1;
         $answer = new ZhihuAnswer();
         $answer->author_id = $author_id;
         $answer->content = $data['answer_content'];
-        $answer->create_time=time();
+        $answer->create_time = time();
         $answer->answer_id = $data['answer_id'];
         $answer->save();
         $a['state'] = 1;
 
-        $p=ZhihuAnswer::find()
+        $p = ZhihuAnswer::find()
             ->asArray()
-            ->where(['answer_id'=>$data['answer_id']])
+            ->where(['answer_id' => $data['answer_id']])
             ->asArray()->all();
         $authors = Member::find()->select(['username'])->indexBy('id')->column();
-        foreach ($p as $k=>$v){
+        foreach ($p as $k => $v) {
             $p[$k]['author_name'] = $authors[$v['author_id']];
-            $p[$k]['up_count'] = empty($v['up_count'])?0:$v['up_count'];
+            $p[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
         $a['content'] = $p;
         return Json::encode($a);
     }
 
-    public function actionFollowAuthor(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $author_id = $data['author_id'];
-        $fl=new FollowRelation();
-        $fl->user_id=$author_id;
-        $fl->follower_id=Yii::$app->user->id;
-        $fl->save();
-        $p['state']=1;
-        return Json::encode($p);
-    }
 
-    public function actionVote(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $answer_id = $data['id'];
-        $answer = ZhihuAnswer::findOne($answer_id);
-        $answer->has_vote = 1;
-        $answer->up_count+=1;
-        $answer->save();
-        $a['state'] = 1;
-        return Json::encode($a);
-    }
-
-    public function actionComment(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $answer_id = $data['id'];
-        $res=Comment::find()
-            ->with('author')
-            ->where(['answer_id'=>$answer_id])->asArray()->all();
-        foreach ($res as $k=>$v){
-            $res[$k]['create_time'] = date('H:i',$res[$k]['create_time']);
+    /**
+     * 获取用户关注问题
+     * @return string
+     */
+    public function actionGetFollowAnswer()
+    {
+        $follow_ids = ZhihuQuestionFollow::find()->where(['user_id' => JwtTool::getUserId()])->select(['question_id'])->column();
+        $questions = ZhihuQuestion::find()->where(['id' => $follow_ids])->asArray()->all();
+        $authors = Member::find()->select(['username'])->indexBy('id')->column();
+        foreach ($questions as $k => $v) {
+            $questions[$k]['author_name'] = $authors[$v['author_id']];
+            $questions[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
-        return Json::encode($res);
+        return Json::encode(['code' => 0, 'data' => $questions]);
     }
 
-    public function actionLeaveComment(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $answer_id = $data['id'];
-        $commnet = new Comment();
-        $commnet->author_id = 1;
-        $commnet->create_time = time();
-        $commnet->vote_count = 0;
-        $commnet->content  = $data['content'];
-        $commnet->answer_id = $answer_id;
-        if(!$commnet->save()){
-            $res['text'] =$commnet->getErrors();
-            return Json::encode($res);
+    /**
+     * 取消关注回答
+     * @return string
+     */
+    public function actionCancelFollowAnswer()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        ZhihuQuestionFollow::deleteAll(['user_id' => JwtTool::getUserId(), 'question_id' => $data['id']]);
+        $follow_ids = ZhihuQuestionFollow::find()->where(['user_id' => JwtTool::getUserId()])->select(['question_id'])->column();
+        $questions = ZhihuQuestion::find()->where(['id' => $follow_ids])->asArray()->all();
+        $authors = Member::find()->select(['username'])->indexBy('id')->column();
+        foreach ($questions as $k => $v) {
+            $questions[$k]['author_name'] = $authors[$v['author_id']];
+            $questions[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
-        $res=Comment::find()
-            ->with('author')
-            ->where(['answer_id'=>$answer_id])->asArray()->all();
-        foreach ($res as $k=>$v){
-            $res[$k]['create_time'] = date('H:i',$res[$k]['create_time']);
-        }
-        return Json::encode($res);
+        return Json::encode(['code' => 0, 'data' => $questions]);
     }
 
-    public function actionTest11(){
-        $data = ['token' => 333, 'uid' => 222, 'login_name' => 111 , 'sid'=>23]; //默认sid];
-        print_r(static::getToken($data));
-    }
 
     /**
      * 生成token
@@ -213,19 +191,20 @@ class FollowController extends Controller
         return (string)$token;
     }
 
-    public function actionVoteComment(){
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
+    public function actionVoteComment()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $answer_id = $data['id'];
         $comment_id = $data['comment_id'];
-        $answer = Comment::findOne($comment_id);
-        $answer->vote_count+=1;
+        $answer = ZhihuComment::findOne($comment_id);
+        $answer->vote_count += 1;
         $answer->save();
-        $res=Comment::find()
+        $res = ZhihuComment::find()
             ->with('author')
-            ->where(['answer_id'=>$answer_id])->asArray()->all();
-        foreach ($res as $k=>$v){
-            $res[$k]['create_time'] = date('H:i',$res[$k]['create_time']);
+            ->where(['answer_id' => $answer_id])->asArray()->all();
+        foreach ($res as $k => $v) {
+            $res[$k]['create_time'] = date('H:i', $res[$k]['create_time']);
         }
         return Json::encode($res);
     }

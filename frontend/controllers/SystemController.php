@@ -2,7 +2,7 @@
 namespace frontend\controllers;
 
 use general\models\Bike;
-use general\models\Comment;
+use general\models\ZhihuComment;
 use general\models\FollowRelation;
 use general\models\Member;
 use general\models\Banner;

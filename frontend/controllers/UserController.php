@@ -48,6 +48,11 @@ class UserController extends Controller
         header("Content-Type: application/json; charset=utf-8");
     }
 
+    public function actionTest()
+    {
+        return $this->render($this->action->id);
+    }
+
 
     public function actionInfo()
     {
@@ -368,14 +373,12 @@ class UserController extends Controller
      */
     public function actionFollowList()
     {
-        $header = Yii::$app->request->headers;
-        $token = $header->get('token');
         $res = FollowRelation::find()
             ->select(['m.username', 'm.id', 'm.brief', 'm.avatar'])
             ->from(FollowRelation::tableName() . ' fr')
             ->innerJoin(Member::tableName() . ' m', 'm.id=fr.user_id')
-            ->where(['follower_id' => JwtTool::parseToken($token)])->asArray()->all();
-        $a['state'] = 1;
+            ->where(['follower_id' => JwtTool::getUserId()])->asArray()->all();
+        $a['code'] = 0;
         $a['data'] = $res;
         return Json::encode($a);
     }
@@ -385,15 +388,26 @@ class UserController extends Controller
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
         $author_id = $data['author_id'];
-        $fl = new FollowRelation();
-        $fl->user_id = $author_id;
         $header = Yii::$app->request->headers;
         $token = $header->get('token');
-        $fl->follower_id = JwtTool::parseToken($token);
-        $fl->save();
-        $p['state'] = 1;
+        $follower_id = JwtTool::parseToken($token);
+        $followed = FollowRelation::findOne(['user_id' => $author_id, 'follower_id' => $follower_id]);
+        if (!$followed) {
+            $fl = new FollowRelation();
+            $fl->user_id = $author_id;
+
+
+            $fl->follower_id = $follower_id;
+            $fl->save();
+            $p['follow_text'] = '已关注';
+        } else {
+            FollowRelation::deleteAll(['user_id' => $author_id, 'follower_id' => $follower_id]);
+            $p['follow_text'] = '关注';
+        }
+
         return Json::encode($p);
     }
+
 
     public function actionCancelFollow()
     {
@@ -403,7 +417,7 @@ class UserController extends Controller
         }
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-        FollowRelation::deleteAll(['follower_id'=>$uid,'user_id'=>$data['id']]);
+        FollowRelation::deleteAll(['follower_id' => $uid, 'user_id' => $data['id']]);
         $res = FollowRelation::find()
             ->select(['m.username', 'm.id', 'm.brief', 'm.avatar'])
             ->from(FollowRelation::tableName() . ' fr')

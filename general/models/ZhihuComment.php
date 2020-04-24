@@ -14,14 +14,14 @@ use Yii;
  * @property integer $vote_count
  * @property integer $answer_id
  */
-class Comment extends \yii\db\ActiveRecord
+class ZhihuComment extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'comment';
+        return 'zhihu_comment';
     }
 
     /**
