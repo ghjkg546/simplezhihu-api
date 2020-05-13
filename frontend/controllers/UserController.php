@@ -61,7 +61,7 @@ class UserController extends Controller
         $user_id = JwtTool::getUserId();
         $user = ZhihuMember::findOne(['id' => $user_id]);
         $answer_count = ZhihuAnswer::find()->where(['author_id' => $user_id])->count();
-        $follow_count = ZhihuFollowUser::find()->where(['user_id' => $user_id])->count();
+        $follow_count = FollowRelation::find()->where(['user_id' => $user_id])->count();
         $fav_count = ZhihuFav::find()->where(['user_id' => $user_id])->count();
         $view_count = ZhihuQuestionViewLog::find()->where(['user_id' => $user_id])->count();
         return Json::encode([
@@ -253,7 +253,7 @@ class UserController extends Controller
         $password = $data['password'];
         $member = ZhihuMember::find()->where(['username' => $name, 'password' => md5($password)])->one();
         if ($member) {
-            $token_data = ['uid' => $member->id, 'login_name' => $name]; //默认sid];
+            $token_data = ['uid' => $member->id, 'login_name' => $name];
             $token = static::getToken($token_data);
             $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name]; //默认sid];
             return Json::encode(['state' => 1, 'text' => '', 'data' => $data, 'toekn' => $token]);

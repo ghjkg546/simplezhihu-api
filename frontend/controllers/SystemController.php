@@ -23,8 +23,6 @@ use common\models\LoginForm;
  */
 class SystemController extends Controller
 {
-    
-
 
 
     /**
@@ -32,10 +30,10 @@ class SystemController extends Controller
      *
      * @return string
      */
-   public $savePath = NULL;
+    public $savePath = NULL;
     public $saveUrl = NULL;
     private $_fileInstance;
-    public $layout=false;
+    public $layout = false;
     public $enableCsrfValidation = false;
 
     public function init()
@@ -49,35 +47,33 @@ class SystemController extends Controller
         header("Content-Type: application/json; charset=utf-8");
     }
 
-    
 
     public function actionDetail()
     {
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $p=SystemSetting::find()
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $p = SystemSetting::find()
             ->asArray()
             ->one();
-        $res = ['code'=>20000,'text'=>'success','data'=>$p];
+        $res = ['code' => 20000, 'text' => 'success', 'data' => $p];
         return Json::encode($res);
     }
 
     public function actionSaveDetail()
     {
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        $p=SystemSetting::find()->one();
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $p = SystemSetting::find()->one();
         $p->attributes = $data;
-        if(!$p->save()){
-            $res = ['code'=>20000,'text'=>$p->getErrors(),'data'=>$p];
+        if (!$p->save()) {
+            $res = ['code' => 20000, 'text' => $p->getErrors(), 'data' => $p];
         } else {
-            $res = ['code'=>20000,'text'=>'success','data'=>$p];
+            $res = ['code' => 20000, 'text' => 'success', 'data' => $p];
         }
-        
+
         return Json::encode($res);
     }
 
-    
 
     /**
      * 生成token
@@ -99,37 +95,38 @@ class SystemController extends Controller
 
     public function actionBannerList()
     {
-        $data=  Banner::find()->all();
-        
-            $res = ['code'=>20000,'text'=>'success','data'=>$data];
-        
-        
+        $data = Banner::find()->all();
+
+        $res = ['code' => 20000, 'text' => 'success', 'data' => $data];
+
+
         return Json::encode($res);
     }
 
     public function actionCaseList()
     {
 
-        $data=  CaseCate::find()->all();
-        
-            $res = ['code'=>20000,'text'=>'success','data'=>$data];
-        
-        
+        $data = CaseCate::find()->all();
+
+        $res = ['code' => 20000, 'text' => 'success', 'data' => $data];
+
+
         return Json::encode($res);
     }
 
     public function actionDeleteBanner()
     {
-        $data=file_get_contents('php://input');
-        $data=Json::decode($data);
-        Banner::deleteAll(['id'=>$data['id']]);
-        $data=  Banner::find()->all();
-        $res = ['code'=>20000,'text'=>'success','data'=>$data];
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        Banner::deleteAll(['id' => $data['id']]);
+        $data = Banner::find()->all();
+        $res = ['code' => 20000, 'text' => 'success', 'data' => $data];
         return Json::encode($res);
     }
 
-    public function actionUploadImg() {
-        $this->savePath='images';
+    public function actionUploadImg()
+    {
+        $this->savePath = 'images';
         $this->_fileInstance = UploadedFile::getInstanceByName('img');
         $id = Yii::$app->request->post('id');
         if (!$this->_fileInstance) {
@@ -149,15 +146,16 @@ class SystemController extends Controller
         }
         $flag = $this->_fileInstance->saveAs($this->savePath . DIRECTORY_SEPARATOR . $fileName);
         $banner1 = Banner::findOne($id);
-        $banner = !empty($banner1)?$banner1:new Banner();
-        $banner->img_url = 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->savePath . '/' . $fileName;
+        $banner = !empty($banner1) ? $banner1 : new Banner();
+        $banner->img_url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this->savePath . '/' . $fileName;
         $banner->save();
-        $data=  Banner::find()->all();
-        return Json::encode(['error' => $flag ? 0 : 1, 'message' => $flag ? '' : '上传失败', 'url' => 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->savePath . '/' . $fileName,'id'=>$banner->id,'data'=>$data]);
+        $data = Banner::find()->all();
+        return Json::encode(['error' => $flag ? 0 : 1, 'message' => $flag ? '' : '上传失败', 'url' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this->savePath . '/' . $fileName, 'id' => $banner->id, 'data' => $data]);
     }
 
-    public function actionUploadCateImg() {
-        $this->savePath='images';
+    public function actionUploadCateImg()
+    {
+        $this->savePath = 'images';
         $this->_fileInstance = UploadedFile::getInstanceByName('img');
         $id = Yii::$app->request->post('id');
         if (!$this->_fileInstance) {
@@ -178,79 +176,78 @@ class SystemController extends Controller
         $flag = $this->_fileInstance->saveAs($this->savePath . DIRECTORY_SEPARATOR . $fileName);
         $cate = CaseCate::findOne($id);
         $id = 0;
-        if(!empty($cate)){
-            $cate->img_url = 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->savePath . '/' . $fileName;
+        if (!empty($cate)) {
+            $cate->img_url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this->savePath . '/' . $fileName;
             $cate->save();
             $id = $cate->id;
         }
-        
-        
-        
-        $data=  CaseCate::find()->all();
-        return Json::encode(['error' => $flag ? 0 : 1, 'message' => $flag ? '' : '上传失败', 'url' => 'http://'.$_SERVER['HTTP_HOST'].'/'.$this->savePath . '/' . $fileName,'id'=>$id,'data'=>$data]);
+
+
+        $data = CaseCate::find()->all();
+        return Json::encode(['error' => $flag ? 0 : 1, 'message' => $flag ? '' : '上传失败', 'url' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this->savePath . '/' . $fileName, 'id' => $id, 'data' => $data]);
     }
 
-    public function actionSaveCaseCate(){
-        if(Yii::$app->request->isPost){
-            $data=file_get_contents('php://input');
-            $data=Json::decode($data);
+    public function actionSaveCaseCate()
+    {
+        if (Yii::$app->request->isPost) {
+            $data = file_get_contents('php://input');
+            $data = Json::decode($data);
 
             $news = CaseCate::findOne($data['id']);
-            $news = !empty($news)?$news:new CaseCate();
+            $news = !empty($news) ? $news : new CaseCate();
             $news->name = $data['name'];
 
-            if(!$news->save()){
-                $res = ['state'=>0,'text'=>$news->getErrors()];
+            if (!$news->save()) {
+                $res = ['state' => 0, 'text' => $news->getErrors()];
                 return Json::encode($res);
             };
-            $res = ['code'=>20000,'text'=>'保存成功'];
+            $res = ['code' => 20000, 'text' => '保存成功'];
             return Json::encode($res);
-        
+
         }
     }
 
-    public function actionDeleteCaseCate(){
-        if(Yii::$app->request->isPost){
-            $data=file_get_contents('php://input');
-            $data=Json::decode($data);
+    public function actionDeleteCaseCate()
+    {
+        if (Yii::$app->request->isPost) {
+            $data = file_get_contents('php://input');
+            $data = Json::decode($data);
 
-            $news = CaseCate::deleteAll(['id'=>$data['id']]);
+            $news = CaseCate::deleteAll(['id' => $data['id']]);
             $list = CaseCate::find()->all();
-            $res = ['code'=>20000,'text'=>'删除成功','list'=>$list];
+            $res = ['code' => 20000, 'text' => '删除成功', 'list' => $list];
             return Json::encode($res);
-        
+
         }
     }
 
-    public function actionSaveCase(){
-        if(Yii::$app->request->isPost){
-            $data=file_get_contents('php://input');
-            $data=Json::decode($data);
+    public function actionSaveCase()
+    {
+        if (Yii::$app->request->isPost) {
+            $data = file_get_contents('php://input');
+            $data = Json::decode($data);
 
             $news = Cases::findOne($data['id']);
 
-            $news = !empty($news)?$news:new Cases();
+            $news = !empty($news) ? $news : new Cases();
             $news->title = $data['title'];
             $news->content = $data['content'];
             $news->create_time = time();
-            $news->img_url=$data['img_url'];
-            $news->product=$data['product'];
-            $news->industry=$data['industry'];
+            $news->img_url = $data['img_url'];
+            $news->product = $data['product'];
+            $news->industry = $data['industry'];
 
             $news->cate_id = $data['cate_id'];
 
-            if(!$news->save()){
-                $res = ['state'=>0,'text'=>$news->getErrors()];
+            if (!$news->save()) {
+                $res = ['state' => 0, 'text' => $news->getErrors()];
                 return Json::encode($res);
             };
-            $res = ['code'=>20000,'text'=>'保存成功'];
+            $res = ['code' => 20000, 'text' => '保存成功'];
             return Json::encode($res);
-        
+
         }
     }
-    
-
-    
 
 
 }

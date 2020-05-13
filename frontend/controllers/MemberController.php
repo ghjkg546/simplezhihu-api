@@ -14,9 +14,9 @@ use yii\filters\AccessControl;
 use common\models\LoginForm;
 
 /**
- * Site controller
+ * 小黄车会员控制器
  */
-class UserController extends Controller
+class MemberController extends Controller
 {
 
 
@@ -89,7 +89,6 @@ class UserController extends Controller
         $member=new Member();
         $member->username=$b['name'];
         $member->money =$b['money'];
-        //$member->
     }
 
     public function actionEdit(){

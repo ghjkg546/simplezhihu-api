@@ -9,24 +9,13 @@ use Yii;
  *
  * @property integer $id
  * @property integer $type
- * @property integer $content
+ * @property string $content
+ * @property integer $content_id
  * @property integer $user_id
+ * @property integer $create_time
  */
 class ZhihuNotice extends \yii\db\ActiveRecord
 {
-    /**
-     * 通知类型
-     * @var integer 评论与赞同
-     */
-    const NOTICE_TYPE_COMMENT = 1;
-
-    /**
-     * 通知类型
-     * @var integer 回答关注问题
-     */
-    const NOTICE_TYPE_ANSWER = 2;
-
-
     /**
      * @inheritdoc
      */
@@ -41,7 +30,8 @@ class ZhihuNotice extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'content', 'user_id'], 'integer'],
+            [['type', 'content_id', 'user_id', 'create_time'], 'integer'],
+            [['content'], 'string', 'max' => 200],
         ];
     }
 
@@ -54,7 +44,9 @@ class ZhihuNotice extends \yii\db\ActiveRecord
             'id' => 'ID',
             'type' => 'Type',
             'content' => 'Content',
+            'content_id' => 'Content ID',
             'user_id' => 'User ID',
+            'create_time' => 'Create Time',
         ];
     }
 }

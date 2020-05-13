@@ -1,7 +1,6 @@
 <?php
 namespace frontend\controllers;
 
-use backend\models\ZhihuQuestion;
 use general\components\JwtTool;
 use general\components\Tool;
 use general\models\ZhihuAnswerLike;
@@ -10,6 +9,7 @@ use general\models\FollowRelation;
 use general\models\Member;
 use general\models\ZhihuAnswer;
 use general\models\ZhihuCommentLikeUser;
+use general\models\ZhihuQuestion;
 use general\repositories\AnswerRepository;
 use general\repositories\CommentRepository;
 use Yii;

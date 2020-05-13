@@ -137,8 +137,8 @@ class QuestionController extends Controller
     {
         $post = file_get_contents('php://input');
         $post = Json::decode($post);
-        $exist = ZhihuQuestionFollow::findOne(['question_id'=>$post['question_id'],'user_id'=>JwtTool::getUserId()]);
-        if(empty($exist)){
+        $exist = ZhihuQuestionFollow::findOne(['question_id' => $post['question_id'], 'user_id' => JwtTool::getUserId()]);
+        if (empty($exist)) {
             $follow = new ZhihuQuestionFollow();
             $follow->question_id = $post['question_id'];
             $follow->user_id = JwtTool::getUserId();
@@ -146,12 +146,12 @@ class QuestionController extends Controller
             $follow->save();
             $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $post['question_id']])->count();
             $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
-            return Json::encode(['state' => 1,'follow_count'=>$follow_count]);
+            return Json::encode(['state' => 1, 'follow_count' => $follow_count]);
         } else {
-            ZhihuQuestionFollow::deleteAll(['question_id'=>$post['question_id'],'user_id'=>JwtTool::getUserId()]);
+            ZhihuQuestionFollow::deleteAll(['question_id' => $post['question_id'], 'user_id' => JwtTool::getUserId()]);
             $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $post['question_id']])->count();
             $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
-            return Json::encode(['state' => 0,'follow_count'=>$follow_count]);
+            return Json::encode(['state' => 0, 'follow_count' => $follow_count]);
         }
 
     }
