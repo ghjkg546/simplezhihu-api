@@ -20,7 +20,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 
 /**
- * Site controller
+ * 通知控制器
  */
 class NoticeController extends Controller
 {
@@ -32,34 +32,6 @@ class NoticeController extends Controller
      */
     public $layout=false;
     public $enableCsrfValidation = false;
-
-    public function actionIndex()
-    {
-        $post=file_get_contents('php://input');
-        $post=Json::decode($post);
-        switch ($post['type']){
-            case 'recent':
-                $questions=ZhihuQuestionViewLog::find()->from(ZhihuQuestionViewLog::tableName().' log')
-                    ->select(['question.*','log.view_time'])->innerJoin(ZhihuQuestion::tableName().' question','log.question_id=question.id')
-                    ->orderBy('log.view_time desc')
-                    ->where(['user_id'=>JwtTool::getUserId()])
-                    ->asArray()->all();
-                foreach ($questions as $k=>$v){
-                    $questions[$k]['content'] = mb_substr(strip_tags( $v['content']),0,50);
-
-                }
-                return Json::encode($questions);
-                break;
-
-            case 'fav':
-                $data= ZhihuFav::find()->select(['cate_count' => 'count(*)','category_name'])
-                    ->where(['user_id'=>JwtTool::getUserId()])
-                    ->groupBy('category_name')->asArray()->all();
-                return Json::encode($data);
-                break;
-        }
-
-    }
 
     /**
      * 通知列表

@@ -43,7 +43,8 @@ class QuestionRepository
 
     private $question_invite;
 
-    function __construct() {
+    function __construct()
+    {
         $this->question_invite = new InviteRepository();
     }
 
@@ -88,7 +89,8 @@ class QuestionRepository
         return $questions;
     }
 
-    public function one($data){
+    public function one($data)
+    {
         $question = ZhihuQuestion::findOne($data['id']);
         $answers = ZhihuAnswer::find()
             ->asArray()
@@ -104,14 +106,15 @@ class QuestionRepository
         $result['follow'] = ZhihuQuestionFollow::find()->where(['question_id' => $data['id'], 'user_id' => JwtTool::getUserId()])->one() ? 1 : 0;
         $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $data['id']])->count();
         $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
-        $comment_count = ZhihuComment::find()->where(['answer_id'=>array_column($answers,'id')])->count();
+        $comment_count = ZhihuComment::find()->where(['answer_id' => array_column($answers, 'id')])->count();
         $result['comment_count'] = !empty($comment_count) ? $comment_count : 0;
 
         $result['invite_member'] = $this->question_invite->memberList($data['id']);
         return $result;
     }
 
-    public function writeAnswer($data){
+    public function writeAnswer($data)
+    {
         $author_id = JwtTool::getUserId();
         $answer = new ZhihuAnswer();
         $answer->author_id = $author_id;
@@ -125,7 +128,7 @@ class QuestionRepository
             ->all();
 
         $followed = ZhihuQuestionFollow::find()->select(['user_id'])->where(['question_id' => $data['question_id']])->column();
-        if($followed){
+        if ($followed) {
             $author_name = ZhihuMember::find()->select(['username'])->where(['id' => $author_id])->scalar();
             //发消息
             foreach ($followed as $v) {
@@ -143,7 +146,7 @@ class QuestionRepository
             $answers[$k]['author_name'] = $authors[$v['author_id']];
             $answers[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
-        $result['state'] = 1;
+        $result['code'] = 1;
         $result['answers'] = $answers;
         return $result;
     }

@@ -25,7 +25,7 @@ use yii\filters\AccessControl;
 use common\models\LoginForm;
 
 /**
- * Site controller
+ * 问题控制器
  */
 class QuestionController extends Controller
 {
@@ -39,6 +39,10 @@ class QuestionController extends Controller
     public $layout = false;
     public $enableCsrfValidation = false;
 
+    /**
+     * 问题资源库
+     * @var QuestionRepository
+     */
     private $questionRepository;
 
     public function init()
@@ -52,15 +56,21 @@ class QuestionController extends Controller
         parent::__construct($id, $module, $config);
     }
 
+    /*
+     * 问题列表
+     */
     public function actionIndex()
     {
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
 
         $questions = $this->questionRepository->all($data);
-        return Json::encode($questions);
+        return Json::encode(['code'=>1,'data'=>$questions]);
     }
 
+    /**
+     * 最近浏览
+     */
     public function actionRecent()
     {
         $data = file_get_contents('php://input');
@@ -76,7 +86,6 @@ class QuestionController extends Controller
             $qu->andWhere(['author_id' => $ids]);
         }
         $p = $qu->all();
-        $member = Member::find()->indexBy('id')->asArray()->all();
         foreach ($p as $k => $v) {
             $p['content'] = substr($v['content'], 0, 100);
 
@@ -84,6 +93,10 @@ class QuestionController extends Controller
         return Json::encode($p);
     }
 
+    /**
+     * 问题详情
+     * @return string
+     */
     public function actionDetail()
     {
         $data = file_get_contents('php://input');
@@ -92,22 +105,11 @@ class QuestionController extends Controller
         return Json::encode($result);
     }
 
-    public function actionAnswerlist()
-    {
-        $data = file_get_contents('php://input');
-        $data = Json::decode($data);
-        $p = ZhihuAnswer::find()
-            ->asArray()
-            ->where(['answer_id' => $data['id']])
-            ->asArray()->all();
-        $authors = Member::find()->select(['username'])->indexBy('id')->column();
-        foreach ($p as $k => $v) {
-            $p[$k]['author_name'] = $authors[$v['author_id']];
-            $p[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
-        }
-        return Json::encode($p);
-    }
 
+    /**
+     * 写回答
+     * @return string
+     */
     public function actionWriteAnswer()
     {
         $data = file_get_contents('php://input');
@@ -116,6 +118,10 @@ class QuestionController extends Controller
         return Json::encode($result);
     }
 
+    /**
+     * 关注作者
+     * @return string
+     */
     public function actionFollowAuthor()
     {
         $data = file_get_contents('php://input');

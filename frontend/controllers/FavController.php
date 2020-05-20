@@ -16,7 +16,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 
 /**
- * Site controller
+ * 收藏控制器
  */
 class FavController extends Controller
 {
@@ -70,16 +70,16 @@ class FavController extends Controller
         $post = file_get_contents('php://input');
         $post = Json::decode($post);
         $answer_ids = ZhihuFav::find()->where(['category_id' => $post['category_id']])->select(['answer_id'])->column();
-        $qu = ZhihuAnswer::find()
+        $query = ZhihuAnswer::find()
             ->asArray();
-        $qu->andWhere(['id' => $answer_ids]);
+        $query->andWhere(['id' => $answer_ids]);
 
-        $answers = $qu->all();
+        $answers = $query->all();
         $question_titles = ZhihuQuestion::find()->select('title')
-            ->where(['id'=>array_unique(array_column($answers,'question_id'))])->indexBy('id')->column();
-        foreach ($answers as $k=>$v){
-            $answers[$k]['question_title']= $question_titles[$v['question_id']];
-            $answers[$k]['content'] = mb_substr(strip_tags($v['content']),0,100);
+            ->where(['id' => array_unique(array_column($answers, 'question_id'))])->indexBy('id')->column();
+        foreach ($answers as $k => $v) {
+            $answers[$k]['question_title'] = $question_titles[$v['question_id']];
+            $answers[$k]['content'] = mb_substr(strip_tags($v['content']), 0, 100);
         }
         return Json::encode($answers);
     }
@@ -106,11 +106,11 @@ class FavController extends Controller
             $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
         }
         $result['fav'] = $fav;
-        return Json::encode(['state' => 1, 'fav' => $fav]);
+        return Json::encode(['code' => 1, 'fav' => $fav]);
     }
 
     /**
-     * 添加到收藏
+     * 添加收藏文件夹
      * @return string
      */
     public function actionAddNewFolder()
@@ -129,7 +129,7 @@ class FavController extends Controller
             $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
         }
         $result['fav'] = $fav;
-        return Json::encode(['state' => 1, 'fav' => $fav]);
+        return Json::encode(['code' => 1, 'fav' => $fav]);
     }
 
     /**
@@ -144,12 +144,12 @@ class FavController extends Controller
         $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
             ->where(['user_id' => JwtTool::getUserId()])
             ->groupBy('category_id')->indexBy('category_id')->column();
-        $fav = ZhihuFavCategory::find()->asArray()->where(['user_id'=>JwtTool::getUserId()])->all();;
+        $fav = ZhihuFavCategory::find()->asArray()->where(['user_id' => JwtTool::getUserId()])->all();;
         foreach ($fav as $k => $v) {
             $fav[$k]['answer_count'] = isset($answers_per_cate[$v['id']]) ? $answers_per_cate[$v['id']] : 0;
         }
         $result['fav'] = $fav;
-        return Json::encode(['state' => $count > 0 ? 1 : 0, 'fav' => $fav]);
+        return Json::encode(['code' => $count > 0 ? 1 : 0, 'fav' => $fav]);
     }
 
 }

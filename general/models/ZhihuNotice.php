@@ -16,6 +16,9 @@ use Yii;
  */
 class ZhihuNotice extends \yii\db\ActiveRecord
 {
+
+    const NOTICE_TYPE_ANSWER = 3;
+
     /**
      * @inheritdoc
      */

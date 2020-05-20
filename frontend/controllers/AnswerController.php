@@ -18,7 +18,7 @@ use yii\helpers\Json;
 use yii\web\Controller;
 
 /**
- * Site controller
+ * 回答控制器
  */
 class AnswerController extends Controller
 {
@@ -32,7 +32,16 @@ class AnswerController extends Controller
     public $layout = false;
     public $enableCsrfValidation = false;
 
+    /**
+     * 回答资源库
+     * @var AnswerRepository
+     */
     private $answerRepository;
+
+    /**
+     * 评论资源库
+     * @var CommentRepository
+     */
     private $commentRepository;
 
     public function init()
@@ -41,7 +50,6 @@ class AnswerController extends Controller
 
     }
 
-
     public function __construct($id, Module $module, array $config = [])
     {
         $this->answerRepository = new AnswerRepository();
@@ -49,36 +57,11 @@ class AnswerController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    public function actionIndex()
-    {
-        $data = file_get_contents('php://input');
-        $data = Json::decode($data);
-        $type = $data['type'];
-        $qu = ZhihuAnswer::find()
-            ->asArray()
-            ->with('vote_member');
-        if ($type == 1) {
-            $qu->orderBy('up_count desc');
-        } elseif ($type == 0) {
-            $uid = Yii::$app->user->id;
-            $ids = FollowRelation::find()->select(['user_id'])->where(['follower_id' => $uid])->column();
-            $qu->andWhere(['author_id' => $ids]);
-        }
-        $p = $qu->all();
-        $member = Member::find()->indexBy('id')->asArray()->all();
-        foreach ($p as $k => $v) {
-            if (!empty($v['vote_member'])) {
-                foreach ($v['vote_member'] as $k1 => $v1) {
-                    $p[$k]['vote_member'][$k1]['name'] = $member[$v1['member_id']]['username'];
-                }
-            }
-        }
-        foreach ($p as $k => $v) {
-            $p[$k]['voter'] = !empty($v['vote_member'][0]['name']) ? $v['vote_member'][0]['name'] : '还没人';
-        }
-        return Json::encode($p);
-    }
 
+    /**
+     * 答案详情
+     * @return string
+     */
     public function actionDetail()
     {
         $data = file_get_contents('php://input');
@@ -88,24 +71,11 @@ class AnswerController extends Controller
         return Json::encode($result);
     }
 
-    public function actionAnswerlist()
-    {
-        $data = file_get_contents('php://input');
-        $data = Json::decode($data);
-        $p = ZhihuAnswer::find()
-            ->asArray()
-            ->where(['answer_id' => $data['id']])
-            ->asArray()->all();
-        $authors = Member::find()->select(['username'])->indexBy('id')->column();
-        foreach ($p as $k => $v) {
-            $p[$k]['author_name'] = $authors[$v['author_id']];
-            $p[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
-        }
-        $uid = Yii::$app->user->id;
-        return Json::encode($p);
-    }
 
-    //我的回答
+    /**
+     * 我的回答
+     * @return string
+     */
     public function actionMyAnswerList()
     {
         $post = file_get_contents('php://input');
@@ -123,24 +93,7 @@ class AnswerController extends Controller
         foreach ($answers as $k => $v) {
             $answers[$k]['create_time'] = Tool::get_last_time($v['create_time']);
         }
-        return Json::encode(['state' => 1, 'answers' => $answers, 'total_page' => ceil($count / $page_size)]);
-    }
-
-    //写回答
-    public function actionWriteAnswer()
-    {
-        $data = file_get_contents('php://input');
-        $data = Json::decode($data);
-        $author_id = 1;
-        $answer = new ZhihuAnswer();
-        $answer->author_id = $author_id;
-        $answer->content = $data['answer_content'];
-        $answer->create_time = time();
-        $answer->question_id = $data['question_id'];
-        $answer->save();
-        $a['state'] = 1;
-
-        return Json::encode($a);
+        return Json::encode(['code' => 1, 'answers' => $answers, 'total_page' => ceil($count / $page_size)]);
     }
 
     /**
@@ -185,8 +138,8 @@ class AnswerController extends Controller
         $res = ZhihuComment::find()
             ->with('author')
             ->where(['answer_id' => $answer_id])->asArray()->all();
-        $comment_ids = array_column($res,'id');
-        $liked_ids = ZhihuCommentLikeUser::find()->select(['comment_id'])->where(['comment_id'=>$comment_ids])->column();
+        $comment_ids = array_column($res, 'id');
+        $liked_ids = ZhihuCommentLikeUser::find()->select(['comment_id'])->where(['comment_id' => $comment_ids])->column();
         foreach ($res as $k => $v) {
             $res[$k]['create_time'] = date('m-d H:i', $res[$k]['create_time']);
             $res[$k]['liked'] = in_array($v['id'], $liked_ids) ? 1 : 0;
@@ -207,19 +160,6 @@ class AnswerController extends Controller
     }
 
     /**
-     * 感谢
-     * @return string
-     */
-    public function actionThankAnswer()
-    {
-        $data = file_get_contents('php://input');
-        $data = Json::decode($data);
-        $result = $this->answerRepository->thank($data);
-
-        return Json::encode($result);
-    }
-
-    /**
      * 点赞评论
      * @return string
      */
@@ -231,5 +171,17 @@ class AnswerController extends Controller
         return Json::encode($res);
     }
 
+    /**
+     * 感谢
+     * @return string
+     */
+    public function actionThankAnswer()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $result = $this->answerRepository->thank($data);
+
+        return Json::encode($result);
+    }
 
 }
