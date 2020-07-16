@@ -12,6 +12,9 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => [/*'log'*/],
     'modules' => [],
+    'aliases' => [
+        '@general' => $_SERVER['DOCUMENT_ROOT'].'/../../general',
+    ],
     'components' => [
         /*'request' => [
             'csrfParam' => '_csrf-backend',
@@ -23,24 +26,6 @@ return [
             'loginUrl'=>null,
             //'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
         ],
-        /*'session' => [
-            // this is the name of the session cookie used for login on the backend
-            'name' => 'advanced-backend',
-        ],*/
-        /*'user' => [
-            'class' => 'backend\components\ManagerValidator',
-            'identityClass' => 'backend\models\ManagerIdentity',
-            'loginUrl' => ['/home/login'],
-        ],*/
-        /*'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],*/
         'jwt' => [
             'class' => 'sizeg\jwt\Jwt',
             'key' => 'MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQIZpjowaA6CAsCAggA

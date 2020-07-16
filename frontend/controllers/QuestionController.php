@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use general\components\ApiResponse;
 use general\components\JwtTool;
 use general\models\Bike;
 use general\models\ZhihuAnswerFollow;
@@ -30,6 +31,7 @@ use common\models\LoginForm;
 class QuestionController extends Controller
 {
 
+    use ApiResponse;
 
     /**
      * Displays homepage.
@@ -64,8 +66,10 @@ class QuestionController extends Controller
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
 
-        $questions = $this->questionRepository->all($data);
-        return Json::encode(['code'=>1,'data'=>$questions]);
+        $res = $this->questionRepository->findAll($data)['data'];
+        $questions = $res['data'];
+        $count = $res['count'];
+        return $this->success($questions,$count);
     }
 
     /**
@@ -99,8 +103,9 @@ class QuestionController extends Controller
      */
     public function actionDetail()
     {
-        $data = file_get_contents('php://input');
-        $data = Json::decode($data);
+        //$data = file_get_contents('php://input');
+        $data['id'] = 1;
+        //$data = Json::decode($data);
         $result = $this->questionRepository->one($data);
         return Json::encode($result);
     }

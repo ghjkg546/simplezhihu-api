@@ -12,7 +12,7 @@ use Yii;
  * @author 胡植鹏
  *
  */
-class FilemanagerController extends Controller {
+class FileController extends Controller {
 
     public $savePath = NULL;
     public $saveUrl = NULL;
@@ -20,28 +20,9 @@ class FilemanagerController extends Controller {
     public $layout=false;
     public $enableCsrfValidation = false;
 
-    /* (non-PHPdoc)
-     * @see \backend\components\CController::init()
-     */
-
     public function init() {
-
-        
         parent::init();
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With,X-Token");
-        header('P3P: CP="CAO PSA OUR"'); // Makes IE to support cookies
-        header("Content-Type: application/json; charset=utf-8");
-        /*$this->savePath = ROOT_PATH . DIRECTORY_SEPARATOR . 'uploadfile';
-        $this->saveUrl = '/uploadfile';
-        if (!is_dir($this->savePath)) {
-            mkdir($this->savePath, 777);
-        }*/
     }
-
-    
 
    
 
