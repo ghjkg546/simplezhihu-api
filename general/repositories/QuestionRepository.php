@@ -68,6 +68,7 @@ class QuestionRepository
         }
         $keyword = ArrayHelper::getValue($data, 'keyword', null);
         $qu->andFilterWhere(['like', 'content', $keyword]);
+        $count_query = clone $qu;
         $questions = $qu->all();
         $question_ids = array_column($questions, 'id');
 
@@ -99,7 +100,7 @@ class QuestionRepository
             $questions[$k]['follow_count'] = isset($follow_counts[$v['id']]) ? $follow_counts[$v['id']] : 0;
             $questions[$k]['create_time'] = date('Y-m-d h:i:s', $v['create_time']);
         }
-        return $questions;
+        return ['data'=>$questions,'count'=>$count_query->count()];
     }
 
     public function one($data)

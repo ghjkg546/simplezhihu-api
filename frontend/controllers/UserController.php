@@ -119,14 +119,14 @@ class UserController extends Controller
     {
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-        $name = $data['name'];
+        $name = $data['username'];
         $password = $data['password'];
         $member = ZhihuMember::find()->where(['username' => $name, 'password' => md5($password)])->one();
         if ($member) {
             $token_data = ['uid' => $member->id, 'login_name' => $name];
             $token = JwtTool::getToken($token_data);
             $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name]; //默认sid];
-            return Json::encode(['state' => 1, 'text' => '', 'data' => $data, 'toekn' => $token]);
+            return Json::encode(['state' => 1, 'text' => '', 'data' => $data, 'token' => $token]);
         }
         return Json::encode(['state' => 0, 'text' => '错误的用户名密码']);
 

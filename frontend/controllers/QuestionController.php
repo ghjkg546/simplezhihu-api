@@ -65,8 +65,7 @@ class QuestionController extends Controller
     {
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-
-        $res = $this->questionRepository->findAll($data)['data'];
+        $res = $this->questionRepository->findAll($data);
         $questions = $res['data'];
         $count = $res['count'];
         return $this->success($questions,$count);

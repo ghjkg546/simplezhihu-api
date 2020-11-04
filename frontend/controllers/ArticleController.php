@@ -1,8 +1,11 @@
 <?php
 namespace frontend\controllers;
 
+use general\components\JwtTool;
 use general\models\ArticleComment;
 use general\models\Bike;
+use general\models\ZhihuAnswerLike;
+use general\models\ZhihuArticleLike;
 use general\models\ZhihuComment;
 use general\models\FollowRelation;
 use general\models\Member;
@@ -81,12 +84,12 @@ class ArticleController extends Controller
      */
     public function actionDetail()
     {
-
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
         $detail = ZhihuArticle::findOne($data['id'])->toArray();
-
         $author = Member::findOne($detail['author_id'])->toArray();
+        $like = ZhihuArticleLike::findOne(['user_id'=>JwtTool::getUserId(),'article_id'=>$data['id']]);
+        $detail['like_text'] = !empty($like) ? '已赞':'赞';
         $detail['author'] = $author;
         $detail['create_time'] = date('Y-m-d', $detail['create_time']);
         $detail['cover_img'] = !empty($detail['cover_img']) ? Yii::$app->request->getHostInfo() . $detail['cover_img'] : '';
@@ -120,6 +123,26 @@ class ArticleController extends Controller
             $res[$k]['create_time'] = date('H:i', $res[$k]['create_time']);
         }
         return Json::encode(['code' => 1, 'data' => $res]);
+    }
+
+    /**
+     * 文章详情
+     * @return string
+     */
+    public function actionLike()
+    {
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $detail = ZhihuArticle::findOne($data['id'])->toArray();
+
+        $author = Member::findOne($detail['author_id'])->toArray();
+        $detail['author'] = $author;
+        $detail['create_time'] = date('Y-m-d', $detail['create_time']);
+        $detail['cover_img'] = !empty($detail['cover_img']) ? Yii::$app->request->getHostInfo() . $detail['cover_img'] : '';
+        $detail['comments'] = ArticleComment::find()->where(['article_id' => $data['id']])->asArray()->all();
+        $data['code'] = 1;
+        $data['data'] = $detail;
+        return Json::encode($data);
     }
 
 
