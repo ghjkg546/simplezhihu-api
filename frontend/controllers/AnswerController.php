@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use general\components\ApiResponse;
 use general\components\JwtTool;
 use general\components\Tool;
 use general\models\ZhihuAnswerLike;
@@ -23,7 +24,7 @@ use yii\web\Controller;
 class AnswerController extends Controller
 {
 
-
+    use ApiResponse;
     /**
      * Displays homepage.
      *
@@ -68,7 +69,7 @@ class AnswerController extends Controller
         $data = Json::decode($data);
         $result = $this->answerRepository->one($data);
 
-        return Json::encode($result);
+        return $this->success($result,1);
     }
 
 

@@ -33,8 +33,10 @@ class BattlearrayController extends CController
      */
     public function actionList()
     {
-        $page_size = 3;
-        $page = Yii::$app->request->get('page');
+        $page_size = 5;
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $page = $data['page'];
         $result = BatteArray::find()->offset(($page-1)*($page_size))->limit($page_size)
             ->asArray()->all();
         foreach ($result as $k=>$v){
@@ -58,6 +60,28 @@ class BattlearrayController extends CController
         $result['hero_equipments'] = json_decode($result['hero_equipments'],1);
         $result['heros'] = json_decode($result['heros'],1);
         return Json::encode(['code' => 0, 'data' => $result]);
+    }
+
+    /**
+     * 保存阵容
+     * @return string
+     */
+    public function actionSave(){
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $id = empty($data['id'])?0:$data['id'];
+        $result = BatteArray::findOne(['id'=>$id]);
+        $battle = empty($result)?new BatteArray():$result;
+        $battle->title = $data['title'];
+        $battle->heros = Json::encode($data['heros']);
+        $battle->playway = $data['playway'];
+        $battle->hero_equipments = Json::encode($data['hero_equipments']);
+        $battle->update_time = time();
+        $battle->create_time = time();
+        if(!$battle->save()){
+            print_r($battle->getErrors());
+        }
+        return Json::encode(['code' => 0]);
     }
 
 

@@ -65,10 +65,9 @@ class ArticleController extends Controller
 
         $authors = Member::find()->select(['username'])->indexBy('id')->column();
         foreach ($articles as $k => $v) {
-            $articles[$k]['author'] = $authors[$v['author_id']];
+            $articles[$k]['author'] = !empty($authors[$v['author_id']])?$authors[$v['author_id']]:'';
             $articles[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
             $articles[$k]['timestamp'] = time();
-            $articles[$k]['platforms'] = ['aa'];
             $articles[$k]['status'] = 'deleted';
             $articles[$k]['cover_img'] = !empty($p[$k]['cover_img']) ? Yii::$app->request->getHostInfo() . $p[$k]['cover_img'] : '';
         }
@@ -90,7 +89,7 @@ class ArticleController extends Controller
         $author = Member::findOne($detail['author_id'])->toArray();
         $like = ZhihuArticleLike::findOne(['user_id'=>JwtTool::getUserId(),'article_id'=>$data['id']]);
         $detail['like_text'] = !empty($like) ? '已赞':'赞';
-        $detail['author'] = $author;
+        $detail['author_name'] = !empty($author['username'])?$author['username']:'';
         $detail['create_time'] = date('Y-m-d', $detail['create_time']);
         $detail['cover_img'] = !empty($detail['cover_img']) ? Yii::$app->request->getHostInfo() . $detail['cover_img'] : '';
         $detail['comments'] = ArticleComment::find()->where(['article_id' => $data['id']])->asArray()->all();
@@ -143,6 +142,23 @@ class ArticleController extends Controller
         $data['code'] = 1;
         $data['data'] = $detail;
         return Json::encode($data);
+    }
+
+    /*
+     * 保存文章
+     */
+    public function actionSave(){
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
+        $id= !empty($data['id'])?$data['id']:0;
+        $article = ZhihuArticle::findOne(['id'=>$id]);
+        $question =  !empty($article)?$article:new ZhihuArticle();
+        $question->title = $data['title'];
+        $question->content = $data['content'];
+        $question->author_id = JwtTool::getUserId();
+        $question->create_time = time();
+        $question->save();
+        return Json::encode(['code' => 0]);
     }
 
 

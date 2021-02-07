@@ -53,8 +53,7 @@ class QuestionRepository
     {
         $qu = ZhihuQuestion::find()
             ->asArray();
-        //$type = $data['type'];
-        $type=1;
+        $type = $data['type'];
         if ($type == 1) {
             $qu->orderBy('up_count desc');
         } elseif ($type == static::QUESTION_TYPE_FOLLOW) {
@@ -111,8 +110,15 @@ class QuestionRepository
             ->where(['question_id' => $data['id']])
             ->all();
         $authors = Member::find()->select(['username'])->indexBy('id')->column();
+        $comment_count = ZhihuComment::find()->select(['comment_count' => 'count(*)', 'answer_id'])
+            ->where(['answer_id' => array_column($answers, 'id')])
+            ->groupBy('answer_id')
+            ->indexBy('answer_id')
+            ->asArray()->column();
         foreach ($answers as $k => $v) {
-            $answers[$k]['author_name'] = $authors[$v['author_id']];
+            $answers[$k]['comment_count'] = isset($comment_count[$v['id']]) ? $comment_count[$v['id']] : 0;
+            $answers[$k]['create_time'] = date('Y-m-d H:i',$v['create_time']);
+            $answers[$k]['author_name'] = isset($authors[$v['author_id']])?$authors[$v['author_id']]:'';
             $answers[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
         $result['question'] = $question;
@@ -120,8 +126,7 @@ class QuestionRepository
         $result['follow'] = ZhihuQuestionFollow::find()->where(['question_id' => $data['id'], 'user_id' => JwtTool::getUserId()])->one() ? 1 : 0;
         $follow_count = ZhihuQuestionFollow::find()->where(['question_id' => $data['id']])->count();
         $result['follow_count'] = !empty($follow_count) ? $follow_count : 0;
-        $comment_count = ZhihuComment::find()->where(['answer_id' => array_column($answers, 'id')])->count();
-        $result['comment_count'] = !empty($comment_count) ? $comment_count : 0;
+
 
         $result['invite_member'] = $this->question_invite->memberList($data['id']);
         return $result;
@@ -157,7 +162,7 @@ class QuestionRepository
 
         $authors = Member::find()->select(['username'])->indexBy('id')->column();
         foreach ($answers as $k => $v) {
-            $answers[$k]['author_name'] = $authors[$v['author_id']];
+            $answers[$k]['author_name'] = isset($authors[$v['author_id']])?$authors[$v['author_id']]:'';
             $answers[$k]['up_count'] = empty($v['up_count']) ? 0 : $v['up_count'];
         }
         $result['code'] = 1;

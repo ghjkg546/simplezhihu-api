@@ -126,9 +126,9 @@ class UserController extends Controller
             $token_data = ['uid' => $member->id, 'login_name' => $name];
             $token = JwtTool::getToken($token_data);
             $data = ['token' => $token, 'uid' => $member->id, 'login_name' => $name]; //默认sid];
-            return Json::encode(['state' => 1, 'text' => '', 'data' => $data, 'token' => $token]);
+            return Json::encode(['code' => 1, 'text' => '', 'data' => $data, 'token' => $token]);
         }
-        return Json::encode(['state' => 0, 'text' => '错误的用户名密码']);
+        return Json::encode(['code' => 0, 'text' => '错误的用户名密码']);
 
     }
 

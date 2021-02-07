@@ -102,11 +102,10 @@ class QuestionController extends Controller
      */
     public function actionDetail()
     {
-        //$data = file_get_contents('php://input');
-        $data['id'] = 1;
-        //$data = Json::decode($data);
+        $data = file_get_contents('php://input');
+        $data = Json::decode($data);
         $result = $this->questionRepository->one($data);
-        return Json::encode($result);
+        return $this->success($result,1);
     }
 
 

@@ -116,9 +116,4 @@ class ArticleController extends CController
 
 
 
-
-
-
-
-
 }

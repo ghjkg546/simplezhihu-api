@@ -46,53 +46,59 @@ class BattlearrayController extends CController
     }
 
     /*
-     * 问题列表
+     * 阵容列表
      */
     public function actionIndex()
     {
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-
-        $result = BatteArray::find()->asArray()->all();
-        foreach ($result as $k=>$v){
-            $result[$k]['heros'] = json_decode($v['heros'],1);
-            $result[$k]['create_time'] = date('Y-m-d H:s',$v['create_time']);
+        $page_size = 5;
+        $query = BatteArray::find();
+        $query_clone = clone $query;
+        if (!empty($data['page'])) {
+            $query->offset(($data['page'] - 1) * $page_size)->limit($page_size);
+        }
+        $query->andWhere(['like', 'title', $data['keyword']]);
+        $result = $query->asArray()->all();
+        foreach ($result as $k => $v) {
+            $result[$k]['heros'] = json_decode($v['heros'], 1);
+            $result[$k]['create_time'] = date('Y-m-d H:s', $v['create_time']);
         }
 
-        return $this->success($result,BatteArray::find()->count());
+        return $this->success($result,$query_clone->count());
     }
 
-    public function actionDelete(){
+    public function actionDelete()
+    {
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-        //ZhihuQuestion::deleteAll(['id'=>$data['id']]);
-        $page_size = isset($data['pageSize'])?$data['pageSize']:5;
-        $next_question = ZhihuQuestion::find()->offset(($data['page'])*$page_size)->limit(1);//->one();
-
-        print_r($next_question);exit;
-
-        return Json::encode(['code' => 0, 'data' => $next_question]);
+        BatteArray::deleteAll(['id' => $data['id']]);
+        return Json::encode(['code' => 0, 'data' => []]);
     }
 
 
     /**
-     * 问题详情
+     * 阵容详情
      * @return string
      */
     public function actionDetail()
     {
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-        $result = BatteArray::findOne(['id'=>$data['id']]);
-        $result['hero_equipments'] = json_decode($result['hero_equipments'],1);
-        $result['heros'] = json_decode($result['heros'],1);
+        if (empty($data['id'])) {
+            return $this->success([], 0);
+        }
+        $result = BatteArray::findOne(['id' => $data['id']]);
+        $result['hero_equipments'] = json_decode($result['hero_equipments'], 1);
+        $result['heros'] = json_decode($result['heros'], 1);
         return Json::encode(['code' => 0, 'data' => $result]);
     }
 
     public function actionSave(){
         $data = file_get_contents('php://input');
         $data = Json::decode($data);
-        $result = BatteArray::findOne(['id'=>$data['id']]);
+        $id = empty($data['id'])?0:$data['id'];
+        $result = BatteArray::findOne(['id'=>$id]);
         $battle = empty($result)?new BatteArray():$result;
         $battle->title = $data['title'];
         $battle->heros = Json::encode($data['heros']);

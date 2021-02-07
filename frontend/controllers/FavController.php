@@ -118,7 +118,11 @@ class FavController extends Controller
         $post = file_get_contents('php://input');
         $post = Json::decode($post);
         $fav_cate = new ZhihuFavCategory();
-        $fav_cate->user_id = JwtTool::getUserId();
+        $user_id = JwtTool::getUserId();
+        if(empty($user_id)){
+            return Json::encode(['code' => 0, 'msg' => '请先登录']);
+        }
+        $fav_cate->user_id = $user_id;
         $fav_cate->category_name = $post['category_name'];
         $fav_cate->save();
         $answers_per_cate = ZhihuFav::find()->select(['answer_count' => 'count(*)', 'category_id'])
